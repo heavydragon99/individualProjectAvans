@@ -1,0 +1,18 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build",
+      "options": {
+        "cwd": "${workspaceFolder}/code/build"
+      },
+      "type": "shell",
+      "command": "cmake --build . -- -j 16",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$gcc"]
+    }
+  ]
+}

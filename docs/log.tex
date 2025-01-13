@@ -1,0 +1,72 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{enumitem}
+\usepackage{hyperref}
+
+\title{Project Log}
+\author{Sean}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section*{Introduction}
+This document contains the log of activities and hours spent on the individual project for the course individualProject for Avans.
+
+In this course the student needs to make a project that incorporates the graphical card to do some calculations. The student needs to use OpenGl or OpenCL to do this.
+
+\section*{Goal}
+The goal for this projcet is to use openCL to make a fluid simulation where water can be defined in a square space and the graphics card then calculats how the water flows.
+The focus first will be to make this in 2 dimensions. If this is done and there is time left the project will be expanded to 3 dimensions.
+
+\section*{Log of Activities}
+\begin{enumerate}
+    \item \textbf{Read brightspace and init project}
+    \begin{itemize}
+        \item \textbf{Activity} Read the brightspace course
+        \item \textbf{Activity} Setup code environment
+        \item \textbf{Activity} Setup git repository
+        \item \textbf{Activity} Write template for this log
+    \end{itemize}
+    \item \textbf{Google what is OpenCL}
+    \begin{itemize}
+        \item \textbf{Activity} Read \href{https://www.khronos.org/api/index_2017/opencl/}{OpenCL landig page}
+        \item \textbf{Activity} Read \href{https://medium.com/@bcrodrigues/what-is-opencl-14fbec353e09}{What is OpenCL}
+    \end{itemize}
+    \item \textbf{Google openCL tutorial}
+    \begin{itemize}
+        \item \textbf{Activity} Found \href{https://github.com/KhronosGroup/OpenCL-Guide/blob/main/chapters/getting_started_linux.md}{getting started linux} and followed part of tutorial with own knowledge to see if my envirement on new arch linux is working correctly.
+        \item \textbf{Activity} Installed openCL headers
+        \item \textbf{Activity} Followed \href{https://wiki.archlinux.org/title/GPGPU#OpenCL}{Arch wiki} to install openCL
+        \item \textbf{Note} First program did not work. Had to google around and after rereading Arch wiki found I also had to install opencl-cover-mesa package isntead of only openc-nvidia.
+        \item \textbf{Note} Added user to the video group using "sudo usermode -aG video sean", not sure if this was necessary
+    \end{itemize}
+    \item \textbf{}
+    \begin{itemize}
+        \item \textbf{}
+    \end{itemize}
+\end{enumerate}
+
+\section*{Hours Spent}
+\begin{tabular}{|c|l|c|}
+    \hline
+    \# & Activity & Hours \\
+    \hline
+    1 & Read brightspace and init project & 1 \\
+    2 & Google what is OpenCL & 0.5 \\
+    3 & Read OpenCL documentation & 2 \\
+    % Add more hours as needed
+    \hline
+    \multicolumn{2}{|r|}{\textbf{Total Hours}} & 4 \\
+    \hline
+\end{tabular}
+
+\section*{Results}
+\begin{itemize}
+    \item Learned the basics of OpenCL.
+    \item Understood how to use OpenCL for parallel computing.
+    % Add more results as needed
+\end{itemize}
+
+\end{document}
