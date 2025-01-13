@@ -27,6 +27,12 @@ cd individualProjectAvans
     cmake ..
     ```
 
+    or with debug options
+
+    ```sh
+    cmake -DCMAKE_BUILD_TYPE=Debug ..
+    ```
+
 ### Running the Project
 - **Using Visual Studio Code**:
     - Press `F5` to build and run the project.
