@@ -4,7 +4,7 @@
     {
       "label": "Build",
       "options": {
-        "cwd": "${workspaceFolder}/code/build"
+        "cwd": "${workspaceFolder}/build"
       },
       "type": "shell",
       "command": "cmake --build . -- -j 16",

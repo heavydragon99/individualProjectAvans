@@ -47,4 +47,4 @@
 *.vrb
 
 # Build directories
-/code/build/
+/build/

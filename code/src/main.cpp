@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <QApplication>
+#include <QPushButton>
 
 // OpenCL includes
 #include "opencl.hpp"
@@ -93,11 +95,16 @@ void openCLTest()
     {
         std::cout << C[i] << " ";
     }
+    std::cout << std::endl;
 }
 
-int main()
+int main(int argc, char **argv)
 {
-
     openCLTest();
-    return 0;
+    QApplication app (argc, argv);
+    QPushButton button;
+    button.setText("My text");
+    button.setToolTip("A tooltip");
+    button.show();
+    return app.exec();
 }
