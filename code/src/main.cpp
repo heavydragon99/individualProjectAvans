@@ -4,7 +4,7 @@
 // OpenCL includes
 #include "opencl.hpp"
 
-int main()
+void openCLTest()
 {
     // get all platforms (drivers)
     std::vector<cl::Platform> all_platforms;
@@ -93,6 +93,11 @@ int main()
     {
         std::cout << C[i] << " ";
     }
+}
 
+int main()
+{
+
+    openCLTest();
     return 0;
 }
