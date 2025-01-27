@@ -1,10 +1,27 @@
 #include <iostream>
 #include <vector>
+
 #include <QApplication>
-#include <QPushButton>
+#include <QWidget>
+#include <QPainter>
+#include <QPen>
 
 // OpenCL includes
-#include "opencl.hpp"
+#include <opencl.hpp>
+
+class CircleWidget : public QWidget
+{
+protected:
+    void paintEvent(QPaintEvent *event) override
+    {
+        QPainter painter(this);
+        QPen pen(Qt::black, 3);
+        painter.setPen(pen);
+        painter.setRenderHint(QPainter::Antialiasing);
+        painter.setBrush(Qt::black); // Set the brush to fill the circle with blue color
+        painter.drawEllipse(rect());
+    }
+};
 
 void openCLTest()
 {
@@ -101,10 +118,9 @@ void openCLTest()
 int main(int argc, char **argv)
 {
     openCLTest();
-    QApplication app (argc, argv);
-    QPushButton button;
-    button.setText("My text");
-    button.setToolTip("A tooltip");
-    button.show();
+    QApplication app(argc, argv);
+    CircleWidget widget;
+    widget.resize(300, 300);
+    widget.show();
     return app.exec();
 }

@@ -6,9 +6,11 @@ cmake_minimum_required(VERSION 3.10)
 # Set the project name
 project(individualProjectAvans)
 
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
+
+# set(CMAKE_AUTOMOC ON) # Enable automatic invocation of the Meta-Object Compiler (moc) 
+set(CMAKE_AUTOUIC ON) # Enable automatic invocation of the User Interface Compiler (uic)
+set(CMAKE_AUTORCC ON) # Enable automatic invocation of the Resource Compiler (rcc)
+
 # Specify the C++ standard
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -27,3 +29,5 @@ add_executable(${CMAKE_PROJECT_NAME} ${SOURCES})
 
 # Link the libraries
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets OpenCL::OpenCL)
+
+add_definitions(-DCL_HPP_TARGET_OPENCL_VERSION=300)
