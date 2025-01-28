@@ -3,124 +3,84 @@
 
 #include <QApplication>
 #include <QWidget>
+#include <QVBoxLayout>
+#include <QSlider>
+#include <QLabel>
 #include <QPainter>
-#include <QPen>
 
 // OpenCL includes
 #include <opencl.hpp>
 
 class CircleWidget : public QWidget
 {
+public:
+    CircleWidget(QWidget *parent = nullptr) : QWidget(parent), radius(50) {}
+
+    void setRadius(int r)
+    {
+        radius = r;
+        update();
+    }
+
 protected:
     void paintEvent(QPaintEvent *event) override
     {
         QPainter painter(this);
-        QPen pen(Qt::black, 3);
-        painter.setPen(pen);
         painter.setRenderHint(QPainter::Antialiasing);
-        painter.setBrush(Qt::black); // Set the brush to fill the circle with blue color
-        painter.drawEllipse(rect());
+        painter.setBrush(Qt::blue);
+        painter.drawEllipse((width() - radius) / 2, (height() - radius) / 2, radius, radius);
     }
+
+private:
+    int radius;
 };
 
-void openCLTest()
+class MainWindow : public QWidget
 {
-    // get all platforms (drivers)
-    std::vector<cl::Platform> all_platforms;
-    cl::Platform::get(&all_platforms);
-    std::cout << "All platforms: ";
-    for (auto &p : all_platforms)
+public:
+    MainWindow(QWidget *parent = nullptr) : QWidget(parent)
     {
-        std::cout << p.getInfo<CL_PLATFORM_NAME>() << ", ";
-    }
-    if (all_platforms.size() == 0)
-    {
-        std::cout << " No platforms found. Check OpenCL installation!\n";
-        exit(1);
-    }
-    cl::Platform default_platform = all_platforms[0];
-    std::cout << "Using platform: " << default_platform.getInfo<CL_PLATFORM_NAME>() << "\n";
+        // Set the initial window size to 500x600
+        setFixedSize(500, 600);
 
-    // get default device of the default platform
-    std::vector<cl::Device> all_devices;
-    default_platform.getDevices(CL_DEVICE_TYPE_ALL, &all_devices);
-    std::cout << "All devices: ";
-    for (auto &d : all_devices)
-    {
-        std::cout << d.getInfo<CL_DEVICE_NAME>() << ", ";
-    }
-    if (all_devices.size() == 0)
-    {
-        std::cout << " No devices found. Check OpenCL installation!\n";
-        exit(1);
-    }
-    cl::Device default_device = all_devices[0];
-    std::cout << "Using device: " << default_device.getInfo<CL_DEVICE_NAME>() << "\n";
+        QVBoxLayout *mainLayout = new QVBoxLayout(this);
+        QHBoxLayout *layout = new QHBoxLayout();
 
-    cl::Context context({default_device});
-    cl::Program::Sources sources;
+        // Circle widget, takes most of the space
+        circleWidget = new CircleWidget(this);
 
-    // kernel calculates for each element C=A+B
-    std::string kernel_code =
-        "   void kernel simple_add(global const int* A, global const int* B, global int* C){       "
-        "       C[get_global_id(0)]=A[get_global_id(0)]+B[get_global_id(0)];                 "
-        "   }                                                                               ";
+        // Slider widget
+        QSlider *slider = new QSlider(Qt::Horizontal, this); // Horizontal slider
+        slider->setRange(10, 200);
+        slider->setValue(50);
+        QLabel *label = new QLabel("Adjust Circle Size", this);
 
-    sources.push_back({kernel_code.c_str(), kernel_code.length()});
+        // Right-side vertical layout for the slider and label
+        QWidget *sliderContainer = new QWidget(this);
+        sliderContainer->setStyleSheet("background-color: gray;");
+        sliderContainer->setFixedWidth(100); // Set fixed width to 100 pixels
+        QVBoxLayout *sliderLayout = new QVBoxLayout(sliderContainer);
+        sliderLayout->addWidget(label);
+        sliderLayout->addWidget(slider);
+        sliderLayout->setAlignment(Qt::AlignTop);
 
-    cl::Program program(context, sources);
-    if (program.build({default_device}) != CL_SUCCESS)
-    {
-        std::cout << " Error building: " << program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(default_device) << "\n";
-        exit(1);
+        // Add circle widget and slider layout to the horizontal layout
+        layout->addWidget(circleWidget);
+        layout->addWidget(sliderContainer);
+
+        mainLayout->addLayout(layout);
+
+        connect(slider, &QSlider::valueChanged, circleWidget, &CircleWidget::setRadius);
     }
 
-    // create buffers on the device
-    cl::Buffer buffer_A(context, CL_MEM_READ_WRITE, sizeof(int) * 10);
-    cl::Buffer buffer_B(context, CL_MEM_READ_WRITE, sizeof(int) * 10);
-    cl::Buffer buffer_C(context, CL_MEM_READ_WRITE, sizeof(int) * 10);
-
-    int A[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    int B[] = {0, 1, 2, 0, 1, 2, 0, 1, 2, 0};
-
-    // create queue to which we will push commands for the device.
-    cl::CommandQueue queue(context, default_device);
-
-    // write arrays A and B to the device
-    queue.enqueueWriteBuffer(buffer_A, CL_TRUE, 0, sizeof(int) * 10, A);
-    queue.enqueueWriteBuffer(buffer_B, CL_TRUE, 0, sizeof(int) * 10, B);
-
-    // run the kernel
-    // cl::KernelFunctor simple_add(cl::Kernel(program, "simple_add"), queue, cl::NullRange, cl::NDRange(10), cl::NullRange);
-    // simple_add(buffer_A, buffer_B, buffer_C);
-
-    // alternative way to run the kernel
-    cl::Kernel kernel_add = cl::Kernel(program, "simple_add");
-    kernel_add.setArg(0, buffer_A);
-    kernel_add.setArg(1, buffer_B);
-    kernel_add.setArg(2, buffer_C);
-    queue.enqueueNDRangeKernel(kernel_add, cl::NullRange, cl::NDRange(10), cl::NullRange);
-    queue.finish();
-
-    int C[10];
-
-    // read result C from the device to array C
-    queue.enqueueReadBuffer(buffer_C, CL_TRUE, 0, sizeof(int) * 10, C);
-
-    std::cout << " result: \n";
-    for (int i = 0; i < 10; i++)
-    {
-        std::cout << C[i] << " ";
-    }
-    std::cout << std::endl;
-}
+private:
+    CircleWidget *circleWidget;
+};
 
 int main(int argc, char **argv)
 {
-    openCLTest();
     QApplication app(argc, argv);
-    CircleWidget widget;
-    widget.resize(300, 300);
-    widget.show();
+    MainWindow window;
+    window.show();
     return app.exec();
 }
