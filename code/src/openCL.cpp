@@ -1,3 +1,7 @@
+#include <iostream>
+#include <vector>
+#include <opencl.hpp>
+
 void openCLTest()
 {
     // get all platforms (drivers)
