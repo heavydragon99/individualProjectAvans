@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "ScW1rwqTlG8=",
+  "success": true,
+  "projectFilePath": "/home/sean/schoolStuff/avans/leerjaar3/period4/individualProject/individualProjectAvans/code/c#/individualProject.csproj",
+  "expectedPackageFiles": [
+    "/home/sean/.nuget/packages/microsoft.aspnetcore.app.ref/9.0.1/microsoft.aspnetcore.app.ref.9.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -6,8 +6,7 @@ cmake_minimum_required(VERSION 3.10)
 # Set the project name
 project(individualProjectAvans)
 
-
-# set(CMAKE_AUTOMOC ON) # Enable automatic invocation of the Meta-Object Compiler (moc) 
+set(CMAKE_AUTOMOC ON) # Enable automatic invocation of the Meta-Object Compiler (moc) 
 set(CMAKE_AUTOUIC ON) # Enable automatic invocation of the User Interface Compiler (uic)
 set(CMAKE_AUTORCC ON) # Enable automatic invocation of the Resource Compiler (rcc)
 
@@ -15,19 +14,19 @@ set(CMAKE_AUTORCC ON) # Enable automatic invocation of the Resource Compiler (rc
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-find_package(Qt6 COMPONENTS Core Gui Widgets REQUIRED)
-find_package(OpenCL REQUIRED)
+# Set the output directory for the library
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
-# Add include directories
-include_directories(${PROJECT_SOURCE_DIR}/code/inc)
+# Specify the C# project
+set(CS_PROJECT ${CMAKE_SOURCE_DIR}/code/c\#/individualProject.csproj)
 
-# Add source directory
-file(GLOB_RECURSE SOURCES ${PROJECT_SOURCE_DIR}/code/src/*.cpp)
+# Add a custom target to build the C# project using dotnet
+add_custom_target(CSharpApp ALL
+    COMMAND dotnet build -o ${CMAKE_BINARY_DIR} ${CS_PROJECT}
+    DEPENDS PhysicsLibrary
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMENT "Building C# application"
+)
 
-# Add the executable
-add_executable(${CMAKE_PROJECT_NAME} ${SOURCES})
-
-# Link the libraries
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets OpenCL::OpenCL)
-
-add_definitions(-DCL_HPP_TARGET_OPENCL_VERSION=300)
+# Add subdirectory for C++ code
+add_subdirectory(code/c++)

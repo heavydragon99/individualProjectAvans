@@ -1,0 +1,5 @@
+/home/sean/schoolStuff/avans/leerjaar3/period4/individualProject/individualProjectAvans/code/c#/obj/Debug/net9.0/individualProject.GeneratedMSBuildEditorConfig.editorconfig
+/home/sean/schoolStuff/avans/leerjaar3/period4/individualProject/individualProjectAvans/code/c#/obj/Debug/net9.0/individualProject.AssemblyInfoInputs.cache
+/home/sean/schoolStuff/avans/leerjaar3/period4/individualProject/individualProjectAvans/code/c#/obj/Debug/net9.0/individualProject.AssemblyInfo.cs
+/home/sean/schoolStuff/avans/leerjaar3/period4/individualProject/individualProjectAvans/code/c#/obj/Debug/net9.0/individualProject.csproj.CoreCompileInputs.cache
+/home/sean/schoolStuff/avans/leerjaar3/period4/individualProject/individualProjectAvans/code/c#/obj/Debug/net9.0/individualProject.sourcelink.json
