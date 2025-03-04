@@ -15,7 +15,10 @@ include_directories(${PROJECT_SOURCE_DIR}/inc)
 
 # Add source directory
 set(SOURCES
+    ${PROJECT_SOURCE_DIR}/src/fluidSimulation.cpp
     ${PROJECT_SOURCE_DIR}/src/main.cpp
+    ${PROJECT_SOURCE_DIR}/src/particleSystem.cpp
+    ${PROJECT_SOURCE_DIR}/src/Physics.cpp
 )
 
 # Create the executable

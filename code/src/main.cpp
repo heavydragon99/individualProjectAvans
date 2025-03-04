@@ -94,96 +94,11 @@
 //     std::cout << std::endl;
 // }
 
-#include <SFML/Graphics.hpp>
-#include <vector>
-#include <iostream>
-#include <cmath>
-
-struct Particle
-{
-    sf::Vector2f position;
-    sf::Vector2f velocity;
-};
+#include "fluidSimulation.h"
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode({1920, 1080}), "Fluid Simulation");
-    window.setFramerateLimit(60);
-    std::vector<Particle> particles;
-    const float gravity = 9.8f;
-    const float deltaTime = 0.1f;
-    const float collisionDamping = 0.8f;
-    const float particleRadius = 5;
-    const int numOfParticles = 100;
-    const int particlesPerRow = (int)std::sqrt(numOfParticles);
-    const int particlesPerColumn = (numOfParticles - 1) / particlesPerRow + 1;
-    const float particleSpacing = 10;
-    const float spacing = particleRadius * 2 + particleSpacing;
-
-    // Calculate the offset to center the grid
-    const float offsetX = window.getSize().x * 0.5f;
-    const float offsetY = window.getSize().y * 0.5f;
-
-    for (int i = 0; i < numOfParticles; i++)
-    {
-        float x = (i % particlesPerRow - particlesPerRow * 0.5f + 0.5f) * spacing + offsetX;
-        float y = (i / particlesPerRow - particlesPerColumn * 0.5f + 0.5f) * spacing + offsetY;
-        particles.push_back({{x, y}, {0, 0}});
-    }
-
-    while (window.isOpen())
-    {
-        while (const std::optional event = window.pollEvent())
-        {
-            if (event->is<sf::Event::Closed>())
-                window.close();
-            else if (const auto *resized = event->getIf<sf::Event::Resized>())
-            {
-                // update the view to the new size of the window
-                sf::FloatRect visibleArea({0.f, 0.f}, sf::Vector2f(resized->size));
-                window.setView(sf::View(visibleArea));
-            }
-        }
-
-        // Update particle positions
-        for (auto &p : particles)
-        {
-            p.velocity.y += gravity * deltaTime;  // Apply gravity to velocity
-            p.position += p.velocity * deltaTime; // Update position based on velocity
-
-            // Boundary checks
-            if (p.position.x < particleRadius * 0.5)
-            {
-                p.position.x = particleRadius * 0.5;
-                p.velocity.x = -p.velocity.x * collisionDamping; // Reverse velocity
-            }
-            else if (p.position.x > window.getSize().x - particleRadius * 0.5)
-            {
-                p.position.x = window.getSize().x - particleRadius * 0.5;
-                p.velocity.x = -p.velocity.x * collisionDamping; // Reverse velocity
-            }
-
-            if (p.position.y < particleRadius * 0.5)
-            {
-                p.position.y = particleRadius * 0.5;
-                p.velocity.y = -p.velocity.y * collisionDamping; // Reverse velocity
-            }
-            else if (p.position.y > window.getSize().y - particleRadius * 0.5)
-            {
-                p.position.y = window.getSize().y - particleRadius * 0.5;
-                p.velocity.y = -p.velocity.y * collisionDamping; // Reverse velocity
-            }
-        }
-        std::cout << "Particle velocity: " << particles[0].velocity.x << ", " << particles[0].velocity.y << std::endl;
-
-        window.clear();
-        for (const auto &p : particles)
-        {
-            sf::CircleShape shape(5);
-            shape.setPosition(p.position);
-            shape.setFillColor(sf::Color::Cyan);
-            window.draw(shape);
-        }
-        window.display();
-    }
+    FluidSimulation simulation;
+    simulation.run();
+    return 0;
 }
