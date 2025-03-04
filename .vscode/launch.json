@@ -8,7 +8,7 @@
       "name": "Build and debug",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/build/individualProject",
+      "program": "${workspaceFolder}/code/build/individualProjectAvans",
 
       "args": [],
       "stopAtEntry": false,
