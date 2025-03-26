@@ -45,13 +45,12 @@ void Renderer::draw(sf::RenderTarget &target, const ParticleSystem &particleSyst
 
 void Renderer::render(ParticleSystem &particleSystem)
 {
-    // First, draw the particles into the off-screen render texture.
+    // Draw the particles into the off-screen render texture.
     mRenderTexture.clear(sf::Color::Transparent);
     draw(mRenderTexture, particleSystem);
     mRenderTexture.display();
 
-    // Then, clear the window and draw the render texture with the fluid shader applied.
-    mWindow.clear(sf::Color::Black);
+    // Draw the render texture with the fluid shader applied.
     sf::Sprite sprite(mRenderTexture.getTexture());
 
     // Calculate the scale factors while maintaining the aspect ratio.
@@ -62,6 +61,7 @@ void Renderer::render(ParticleSystem &particleSystem)
 
     mWindow.draw(sprite);
     mWindow.display();
+    mWindow.clear(sf::Color::Black);
 }
 
 bool Renderer::isWindowOpen() const

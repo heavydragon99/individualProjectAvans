@@ -1,8 +1,8 @@
 #ifndef PARTICLE_SYSTEM_H
 #define PARTICLE_SYSTEM_H
 
-#include <SFML/Graphics.hpp>
 #include <vector>
+#include <SFML/System/Clock.hpp>
 #include "particle.h"
 
 class ParticleSystem
@@ -10,7 +10,7 @@ class ParticleSystem
 public:
     ParticleSystem(unsigned int aNumParticles, const sf::Vector2u &aWindowSize, float aParticleRadius);
 
-    void update(float aDeltaTime, const sf::Vector2u &aWindowSize);
+    void update(sf::Time aDeltaTime, const sf::Vector2u &aWindowSize);
     const std::vector<Particle>& getParticles() const;
 
 private:

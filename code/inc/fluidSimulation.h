@@ -9,7 +9,6 @@
 #include <imgui.h>
 #include <imgui-SFML.h>
 
-#define DELTA_TIME 0.1f
 #define GAME_SIZE_X 1920
 #define GAME_SIZE_Y 1080
 
@@ -30,8 +29,10 @@ private:
     bool mPaused ;
     unsigned int mParticleCount;
     float mParticleRadius;
+    int mSimulationSpeed;
 
     sf::Clock mDeltaClock;
+    sf::Time mDeltaTime;
     ParticleSystem mParticleSystem;
     Renderer mRenderer;
 };

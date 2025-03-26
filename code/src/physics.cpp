@@ -6,10 +6,11 @@ extern "C" {
     }
 }
 
-void updateParticles(std::vector<Particle> &particles, float deltaTime, const sf::Vector2u &windowSize) {
+void updateParticles(std::vector<Particle> &particles, sf::Time deltaTime, const sf::Vector2u &windowSize)
+{
     for (auto &p : particles) {
-        p.mVelocity.y += GRAVITY * deltaTime;  // Apply gravity.
-        p.mPosition += p.mVelocity * deltaTime; // Update position.
+        p.mVelocity.y += GRAVITY * deltaTime.asSeconds();  // Apply gravity.
+        p.mPosition += p.mVelocity * deltaTime.asSeconds(); // Update position.
 
         // Simple boundary collision detection.
         if (p.mPosition.x < p.mRadius) {

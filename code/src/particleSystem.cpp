@@ -22,7 +22,7 @@ ParticleSystem::ParticleSystem(unsigned int aNumParticles, const sf::Vector2u &a
     }
 }
 
-void ParticleSystem::update(float aDeltaTime, const sf::Vector2u &aWindowSize)
+void ParticleSystem::update(sf::Time aDeltaTime, const sf::Vector2u &aWindowSize)
 {
     updateParticles(mParticles, aDeltaTime, aWindowSize);
 }

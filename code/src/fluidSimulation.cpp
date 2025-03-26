@@ -7,24 +7,36 @@ FluidSimulation::FluidSimulation()
     : mPaused(false),
       mParticleCount(100),
       mParticleRadius(5.f),
+      mSimulationSpeed(1),
       mParticleSystem(mParticleCount, {GAME_SIZE_X, GAME_SIZE_Y}, mParticleRadius),
       mRenderer(5.f, {GAME_SIZE_X, GAME_SIZE_Y})
 {
-    ImGui::SFML::Init(mRenderer.getWindow());
+    if (!ImGui::SFML::Init(mRenderer.getWindow()))
+    {
+        std::cerr << "Failed to initialize ImGui-SFML" << std::endl;
+        return;
+    }
 }
 
 void FluidSimulation::run()
 {
+    const sf::Time updateInterval = sf::seconds(1.f / 60.f);
+    mDeltaTime = mDeltaClock.restart();
+    sf::Clock guiClock;
+    sf::Time timeSinceLastGuiUpdate = sf::Time::Zero;
+
     while (mRenderer.isWindowOpen())
     {
+        mDeltaTime = mDeltaClock.restart() * (float)mSimulationSpeed;
         processEvents();
-        if (!mPaused)
+        update();
+        timeSinceLastGuiUpdate += guiClock.restart();
+        if (timeSinceLastGuiUpdate >= updateInterval)
         {
-            update();
+            render();
+            timeSinceLastGuiUpdate = sf::Time::Zero;
         }
-        render();
     }
-
     ImGui::SFML::Shutdown();
 }
 
@@ -32,6 +44,7 @@ void FluidSimulation::processEvents()
 {
     while (const std::optional event = mRenderer.getWindow().pollEvent())
     {
+        ImGui::SFML::ProcessEvent(mRenderer.getWindow(), *event);
         if (event->is<sf::Event::Closed>())
         {
             mRenderer.close();
@@ -45,25 +58,30 @@ void FluidSimulation::processEvents()
 
 void FluidSimulation::update()
 {
-    ImGui::NewFrame();
-    showUI();
-
-    mParticleSystem.update(DELTA_TIME, {GAME_SIZE_X, GAME_SIZE_Y});
-    ImGui::SFML::Render(mRenderer.getWindow());
+    if (!mPaused)
+    {
+        mParticleSystem.update(mDeltaTime, {GAME_SIZE_X, GAME_SIZE_Y});
+    }
 }
 
 void FluidSimulation::render()
 {
+    showUI();
     mRenderer.render(mParticleSystem);
 }
 
 void FluidSimulation::showUI()
 {
+    ImGui::SFML::Update(mRenderer.getWindow(), mDeltaTime);
     ImGui::Begin("Simulation Controls");
 
     if (ImGui::Button(mPaused ? "Resume" : "Pause"))
     {
         mPaused = !mPaused;
+    }
+
+    if(ImGui::SliderInt("Simulation Speed", &mSimulationSpeed, 1, 10))
+    {
     }
 
     // Particle count slider
@@ -78,4 +96,5 @@ void FluidSimulation::showUI()
     }
 
     ImGui::End();
+    ImGui::SFML::Render(mRenderer.getWindow());
 }
