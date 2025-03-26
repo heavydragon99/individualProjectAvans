@@ -4,3 +4,6 @@
 [submodule "code/modules/SFML"]
 	path = code/modules/SFML
 	url = https://github.com/SFML/SFML.git
+[submodule "code/modules/imgui-sfml"]
+	path = code/modules/imgui-sfml
+	url = https://github.com/SFML/imgui-sfml.git
