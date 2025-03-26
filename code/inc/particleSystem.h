@@ -11,7 +11,7 @@ public:
     ParticleSystem(unsigned int aNumParticles, const sf::Vector2u &aWindowSize, float aParticleRadius);
 
     void update(float aDeltaTime, float aGravity, float aCollisionDamping, const sf::Vector2u &aWindowSize);
-    void draw(sf::RenderTarget &aTarget);
+    const std::vector<Particle>& getParticles() const;
 
 private:
     std::vector<Particle> mParticles;

@@ -55,17 +55,7 @@ void ParticleSystem::update(float aDeltaTime, float aGravity, float aCollisionDa
     }
 }
 
-// Draws each particle to the target.
-void ParticleSystem::draw(sf::RenderTarget &aTarget)
+const std::vector<Particle>& ParticleSystem::getParticles() const
 {
-    sf::CircleShape shape(mParticleRadius);
-    // Draw in white so that the shader can colorize or blend them.
-    shape.setFillColor(sf::Color::White);
-    shape.setOrigin({mParticleRadius, mParticleRadius});
-
-    for (const auto &p : mParticles)
-    {
-        shape.setPosition(p.position);
-        aTarget.draw(shape);
-    }
+    return mParticles;
 }

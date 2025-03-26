@@ -2,7 +2,8 @@
 
 FluidSimulation::FluidSimulation()
     : mWindow(sf::VideoMode({1920, 1080}), "Fluid Simulation"),
-      mParticleSystem(100, mWindow.getSize(), 5.f)
+      mParticleSystem(100, mWindow.getSize(), 5.f),
+      mRenderer(5.f)
 {
     mWindow.setFramerateLimit(60);
 
@@ -60,7 +61,7 @@ void FluidSimulation::render()
 {
     // First, draw the particles into the off-screen render texture.
     mRenderTexture.clear(sf::Color::Transparent);
-    mParticleSystem.draw(mRenderTexture);
+    mRenderer.draw(mRenderTexture, mParticleSystem);
     mRenderTexture.display();
 
     // Then, clear the window and draw the render texture with the fluid shader applied.

@@ -18,7 +18,8 @@ set(SOURCES
     ${PROJECT_SOURCE_DIR}/src/fluidSimulation.cpp
     ${PROJECT_SOURCE_DIR}/src/main.cpp
     ${PROJECT_SOURCE_DIR}/src/particleSystem.cpp
-    ${PROJECT_SOURCE_DIR}/src/Physics.cpp
+    ${PROJECT_SOURCE_DIR}/src/physics.cpp
+    ${PROJECT_SOURCE_DIR}/src/renderer.cpp
 )
 
 # Create the executable

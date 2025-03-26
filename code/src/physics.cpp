@@ -1,4 +1,4 @@
-#include "Physics.h"
+#include "physics.h"
 
 extern "C" {
     double calculatePosition(double initialPosition, double initialVelocity, double time, double acceleration) {
