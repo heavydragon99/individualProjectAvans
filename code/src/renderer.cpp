@@ -1,7 +1,6 @@
 #include "renderer.h"
 
 #include <iostream>
-#include <SFML/Window/Event.hpp>
 
 Renderer::Renderer(float particleRadius, const sf::Vector2u &gameSize)
     : mParticleRadius(particleRadius), mGameSize(gameSize), mWindowSize(getScreenSize()), mWindow(sf::VideoMode(getScreenSize()), "Fluid Simulation")
@@ -65,34 +64,29 @@ void Renderer::render(ParticleSystem &particleSystem)
     mWindow.display();
 }
 
-void Renderer::processEvents()
-{
-    while (const std::optional event = mWindow.pollEvent())
-    {
-        if (event->is<sf::Event::Closed>())
-        {
-            mWindow.close();
-        }
-        else if (const auto *resized = event->getIf<sf::Event::Resized>())
-        {
-            // Create a view with your game area's dimensions.
-            sf::View view(sf::FloatRect({0.f, 0.f}, {mGameSize.x, mGameSize.y}));
-            // Adjust the view to maintain aspect ratio with black bars.
-            view = getLetterboxView(mGameSize, resized->size.x, resized->size.y);
-            mWindow.setView(view);
-
-            // Update shader uniform.
-            // mFluidShader.setUniform("resolution", sf::Vector2f(mGameSize.x, mGameSize.y));
-
-            // Update the window size.
-            mWindowSize = {resized->size.x, resized->size.y};
-        }
-    }
-}
-
 bool Renderer::isWindowOpen() const
 {
     return mWindow.isOpen();
+}
+
+void Renderer::resize(const sf::Vector2u &screenSize)
+{
+    // Create a view with your game area's dimensions.
+    sf::View view(sf::FloatRect({0.f, 0.f}, {mGameSize.x, mGameSize.y}));
+    // Adjust the view to maintain aspect ratio with black bars.
+    view = getLetterboxView(mGameSize, screenSize.x, screenSize.y);
+    mWindow.setView(view);
+
+    // Update shader uniform.
+    // mFluidShader.setUniform("resolution", sf::Vector2f(mGameSize.x, mGameSize.y));
+
+    // Update the window size.
+    mWindowSize = {screenSize.x, screenSize.y};
+}
+
+void Renderer::close()
+{
+    mWindow.close();
 }
 
 sf::Vector2u Renderer::getScreenSize() const

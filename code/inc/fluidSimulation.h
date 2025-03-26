@@ -4,6 +4,10 @@
 #include <iostream>
 #include "particleSystem.h"
 #include "renderer.h"
+#include <SFML/Graphics.hpp>
+#include <SFML/System/Clock.hpp>
+#include <imgui.h>
+#include <imgui-SFML.h>
 
 #define DELTA_TIME 0.1f
 #define GAME_SIZE_X 1920
@@ -20,7 +24,14 @@ private:
     void processEvents();
     void update();
     void render();
+    void showUI();
 
+    // Simulation Parameters
+    bool mPaused ;
+    unsigned int mParticleCount;
+    float mParticleRadius;
+
+    sf::Clock mDeltaClock;
     ParticleSystem mParticleSystem;
     Renderer mRenderer;
 };

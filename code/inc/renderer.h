@@ -11,8 +11,10 @@ public:
 
     void draw(sf::RenderTarget &target, const ParticleSystem &particleSystem);
     void render(ParticleSystem &particleSystem);
-    void processEvents();
     bool isWindowOpen() const;
+    void resize(const sf::Vector2u &screenSize);
+    void close();
+    sf::RenderWindow &getWindow() { return mWindow; }
 
 private:
     float mParticleRadius;
