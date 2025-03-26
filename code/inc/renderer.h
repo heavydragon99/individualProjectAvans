@@ -7,12 +7,23 @@
 class Renderer
 {
 public:
-    Renderer(float particleRadius);
+    Renderer(float particleRadius, const sf::Vector2u &gameSize);
 
     void draw(sf::RenderTarget &target, const ParticleSystem &particleSystem);
+    void render(ParticleSystem &particleSystem);
+    void processEvents();
+    bool isWindowOpen() const;
 
 private:
     float mParticleRadius;
+    sf::Vector2u mGameSize;
+    sf::Vector2u mWindowSize;
+    sf::RenderWindow mWindow;
+    sf::RenderTexture mRenderTexture;
+    // sf::Shader mFluidShader;
+
+    sf::Vector2u getScreenSize() const;
+    sf::View getLetterboxView(const sf::Vector2u &gameSize, int windowWidth, int windowHeight);
 };
 
 #endif // RENDERER_H
