@@ -9,13 +9,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 find_package(OpenCL REQUIRED)
 
-# Add git submodule
+#SFML
+option(SFML_BUILD_AUDIO "Build audio" OFF)
+option(SFML_BUILD_NETWORK "Build network" OFF)
 add_subdirectory(${PROJECT_SOURCE_DIR}/modules/SFML)
+
+#Dear ImGui
 
 # Add include directories
 include_directories(
     ${PROJECT_SOURCE_DIR}/inc 
-    ${PROJECT_SOURCE_DIR}/modules/SFML/include
 )
 
 # Add source directory
@@ -36,6 +39,6 @@ set(SOURCES
 add_executable(${PROJECT_NAME} ${SOURCES})
 
 # Link the libraries
-target_link_libraries(${PROJECT_NAME} PRIVATE OpenCL::OpenCL sfml-system sfml-network sfml-graphics sfml-window)
+target_link_libraries(${PROJECT_NAME} PRIVATE OpenCL::OpenCL sfml-system sfml-graphics sfml-window)
 
 add_definitions(-DCL_HPP_TARGET_OPENCL_VERSION=300)
