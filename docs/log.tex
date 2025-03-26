@@ -23,70 +23,98 @@ The focus first will be to make this in 2 dimensions. If this is done and there 
 \section*{Log of Activities}
 \begin{enumerate}
     \item \textbf{Read brightspace and init project}
-    \begin{itemize}
-        \item \textbf{Activity} Read the brightspace course
-        \item \textbf{Activity} Setup code environment
-        \item \textbf{Activity} Setup git repository
-        \item \textbf{Activity} Write template for this log
-    \end{itemize}
+          \begin{itemize}
+              \item \textbf{Activity} Read the brightspace course
+              \item \textbf{Activity} Setup code environment
+              \item \textbf{Activity} Setup git repository
+              \item \textbf{Activity} Write template for this log
+          \end{itemize}
 
     \item \textbf{Google what is OpenCL}
-    \begin{itemize}
-        \item \textbf{Activity} Read \href{https://www.khronos.org/api/index_2017/opencl/}{OpenCL landig page}
-        \item \textbf{Activity} Read \href{https://medium.com/@bcrodrigues/what-is-opencl-14fbec353e09}{What is OpenCL}
-    \end{itemize}
+          \begin{itemize}
+              \item \textbf{Activity} Read \href{https://www.khronos.org/api/index_2017/opencl/}{OpenCL landig page}
+              \item \textbf{Activity} Read \href{https://medium.com/@bcrodrigues/what-is-opencl-14fbec353e09}{What is OpenCL}
+          \end{itemize}
 
     \item \textbf{Google openCL tutorial}
-    \begin{itemize}
-        \item \textbf{Activity} Found \href{https://github.com/KhronosGroup/OpenCL-Guide/blob/main/chapters/getting_started_linux.md}{getting started linux} and followed part of tutorial with own knowledge to see if my envirement on new arch linux is working correctly.
-        \item \textbf{Activity} Installed openCL headers
-        \item \textbf{Activity} Followed \href{https://wiki.archlinux.org/title/GPGPU#OpenCL}{Arch wiki} to install openCL
-        \item \textbf{Note} First program did not work. Had to google around and after rereading Arch wiki found I also had to install opencl-cover-mesa package isntead of only openc-nvidia.
-        \item \textbf{Note} Added user to the video group using "sudo usermode -aG video sean", not sure if this was necessary
-    \end{itemize}
+          \begin{itemize}
+              \item \textbf{Activity} Found \href{https://github.com/KhronosGroup/OpenCL-Guide/blob/main/chapters/getting_started_linux.md}{getting started linux} and followed part of tutorial with own knowledge to see if my envirement on new arch linux is working correctly.
+              \item \textbf{Activity} Installed openCL headers
+              \item \textbf{Activity} Followed \href{https://wiki.archlinux.org/title/GPGPU#OpenCL}{Arch wiki} to install openCL
+              \item \textbf{Note} First program did not work. Had to google around and after rereading Arch wiki found I also had to install opencl-cover-mesa package isntead of only openc-nvidia.
+              \item \textbf{Note} Added user to the video group using "sudo usermode -aG video sean", not sure if this was necessary
+          \end{itemize}
 
     \item \textbf{Trying to use c++}
-    \begin{itemize}
-        \item \textbf{Activity} Found \href{https://github.com/KhronosGroup/OpenCL-CLHPP}{OpenCL-CLHPP} and looked at the example
-        \item \textbf{Founding} Saw I have to add extra find package to my cmakelists (OpenCLHeaders, OpenCLICDLoader and OpenCLHeaderCpp)
-        \item \textbf{Activity} After searching and trying things for about an hour an nothing working I remembered I can just add the raw hpp file to my project and use it that way.
-    \end{itemize}
+          \begin{itemize}
+              \item \textbf{Activity} Found \href{https://github.com/KhronosGroup/OpenCL-CLHPP}{OpenCL-CLHPP} and looked at the example
+              \item \textbf{Founding} Saw I have to add extra find package to my cmakelists (OpenCLHeaders, OpenCLICDLoader and OpenCLHeaderCpp)
+              \item \textbf{Activity} After searching and trying things for about an hour an nothing working I remembered I can just add the raw hpp file to my project and use it that way.
+          \end{itemize}
 
     \item \textbf{Search and follow basic tutorial of openCL}
-    \begin{itemize}
-        \item \textbf{Activity} Found and followed \href{https://programmerclick.com/article/47811146604/}{Simple start with OpenCL and C++}
-        \item \textbf{Note} In the tutorial a device is selected. At first there was no know device. After searching and testing for about 45 minutes, the problem was that I did not restart my computer.....
-    \end{itemize}
+          \begin{itemize}
+              \item \textbf{Activity} Found and followed \href{https://programmerclick.com/article/47811146604/}{Simple start with OpenCL and C++}
+              \item \textbf{Note} In the tutorial a device is selected. At first there was no know device. After searching and testing for about 45 minutes, the problem was that I did not restart my computer.....
+          \end{itemize}
 
     \item \textbf{Searching for fluids simulator c++ tutorials}
-    \begin{itemize}
-        \item \textbf{Findings} Found two videos which might help me. \href{https://www.youtube.com/watch?v=qsYE1wMEMPA}{But How DO Fluid Simulations Work?} and \href{https://www.youtube.com/watch?v=rSKMYc1CQHE}{Coding Adventure: Simulating Fluids}
-        \item \textbf{Findings} First thing in the second video is how to draw a circle. As I am programming in c++ first have to search how to actually show something on my screen.
-        \item \textbf{note} Have not yet watched videos.
-    \end{itemize}
-    
+          \begin{itemize}
+              \item \textbf{Findings} Found two videos which might help me. \href{https://www.youtube.com/watch?v=qsYE1wMEMPA}{But How DO Fluid Simulations Work?} and \href{https://www.youtube.com/watch?v=rSKMYc1CQHE}{Coding Adventure: Simulating Fluids}
+              \item \textbf{Findings} First thing in the second video is how to draw a circle. As I am programming in c++ first have to search how to actually show something on my screen.
+              \item \textbf{note} Have not yet watched videos.
+          \end{itemize}
+
     \item \textbf{Searching for c++ graphics libraries}
-    \begin{itemize}
-        \item \textbf{Findings} Google says that QT is still the best library for c++ graphics. As I already have a bit of experience with it I will use this. I do want to keep coding in vscode and not use the QT editor.
-        \item \textbf{Findings} After a lot of googling I made it work so qt can be written within vscode. Also supports QTcreator. This so I can use the visual editor of QTcreator later on if needed.
-    \end{itemize}
+          \begin{itemize}
+              \item \textbf{Findings} Found multiple options for graphics. C\# plus c++. SFML. Unity.
+              \item \textbf{Activities} Tried to setup c\#, unity and SFML.
+              \item \textbf{Findings} C\# kinda works. It was very annoying to setup on Linux. Have to learn to many things about c\# to use it good.
+              \item \textbf{Findings} Unity does not work. It makes visualization very easy, but integration with c++ is very hard.
+              \item \textbf{Findings} SFML is a good option. It is a c++ library and is easy to use.
+          \end{itemize}
+
+    \item \textbf{Bouncing ball}
+          \begin{itemize}
+              \item \textbf{Note} Decided to first make a bouncing ball in SFML to get a feel for the library.
+              \item \textbf{Activity} made a bouncing ball in SFML.
+          \end{itemize}
+
+    \item \textbf{Grid of bouncing balls}
+          \begin{itemize}
+              \item \textbf{Note} Wanted to expend the previous code with multiple bouncing balls.
+              \item \textbf{Activity} made a grid of bouncing balls in SFML.
+          \end{itemize}
+
+    \item \textbf{Clean up code}
+          \begin{itemize}
+              \item \textbf{Activity} Cleaned up the code of the grid of bouncing balls.
+              \item \textbf{Activity} Added a class for rendering.
+              \item \textbf{Activity} Added a class for the physics.
+              \item \textbf{Activity} Added submodules for SFML and ImuGui.
+              \item \textbf{Activity} Made code more modular.
+          \end{itemize}
+
 \end{enumerate}
 
 \section*{Hours Spent}
 \begin{tabular}{|c|l|c|}
     \hline
-    \# & Activity & Hours \\
+    \#                                         & Activity                                     & Hours \\
     \hline
-    1 & Read brightspace and init project & 1 \\
-    2 & Google what is OpenCL & 0.5 \\
-    3 & Google openCL tutorial & 1 \\
-    4 & Trying to use c++ & 1.0 \\
-    5 & Search and follow basic tutorial of openCL & 1.0 \\
-    6 & Searching for fluids simulator c++ tutorials & 0.5 \\
-    7 & Searching for c++ graphics libraries & 4 \\
+    1                                          & Read brightspace and init project            & 1     \\
+    2                                          & Google what is OpenCL                        & 0.5   \\
+    3                                          & Google openCL tutorial                       & 1     \\
+    4                                          & Trying to use c++                            & 1.0   \\
+    5                                          & Search and follow basic tutorial of openCL   & 1.0   \\
+    6                                          & Searching for fluids simulator c++ tutorials & 0.5   \\
+    7                                          & Searching for c++ graphics libraries         & 6     \\
+    8                                          & Bouncing ball                                & 1.5   \\
+    9                                          & Grid of bouncing balls                       & 1.5   \\
+    10                                         & Clean up code                                & 3.5   \\
     % Add more hours as needed
     \hline
-    \multicolumn{2}{|r|}{\textbf{Total Hours}} & 4.5 \\
+    \multicolumn{2}{|r|}{\textbf{Total Hours}} & 17.5                                                   \\
     \hline
 \end{tabular}
 
@@ -94,7 +122,7 @@ The focus first will be to make this in 2 dimensions. If this is done and there 
 \begin{itemize}
     \item Learned the basics of OpenCL.
     \item Understood how to use OpenCL for parallel computing.
-    % Add more results as needed
+          % Add more results as needed
 \end{itemize}
 
 \end{document}
