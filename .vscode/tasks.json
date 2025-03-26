@@ -2,17 +2,34 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "Ensure Build Folder",
+      "type": "shell",
+      "command": "mkdir -p ${workspaceFolder}/code/build",
+      "problemMatcher": []
+    },
+    {
+      "label": "CMake",
+      "options": {
+        "cwd": "${workspaceFolder}/code/build"
+      },
+      "type": "shell",
+      "command": "cmake ..",
+      "problemMatcher": ["$gcc"],
+      "dependsOn": "Ensure Build Folder"
+    },
+    {
       "label": "Build",
       "options": {
         "cwd": "${workspaceFolder}/code/build"
       },
       "type": "shell",
-      "command": "cmake --build . -- -j 16",
+      "command": "make -j 4",
       "group": {
         "kind": "build",
         "isDefault": true
       },
-      "problemMatcher": ["$gcc"]
+      "problemMatcher": ["$gcc"],
+      "dependsOn": "CMake"
     }
   ]
 }
