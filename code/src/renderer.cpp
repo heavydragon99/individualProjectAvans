@@ -31,7 +31,7 @@ void Renderer::draw(sf::RenderTarget &target, const ParticleSystem &particleSyst
 
     for (const auto &p : particleSystem.getParticles())
     {
-        shape.setPosition(p.position);
+        shape.setPosition(p.mPosition);
         target.draw(shape);
     }
 

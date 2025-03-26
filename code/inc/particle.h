@@ -6,11 +6,12 @@
 class Particle
 {
 public:
-    sf::Vector2f position;
-    sf::Vector2f velocity;
+    sf::Vector2f mPosition;
+    sf::Vector2f mVelocity;
+    float mRadius;
 
-    Particle(const sf::Vector2f &pos, const sf::Vector2f &vel)
-        : position(pos), velocity(vel) {}
+    Particle(const sf::Vector2f &aPos, const sf::Vector2f &aVel, float aRadius = 1)
+        : mPosition(aPos), mVelocity(aVel), mRadius(aRadius) {}
 };
 
 #endif // PARTICLE_H

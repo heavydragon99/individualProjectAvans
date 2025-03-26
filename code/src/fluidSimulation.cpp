@@ -1,4 +1,5 @@
 #include "fluidSimulation.h"
+#include "physics.h"
 
 FluidSimulation::FluidSimulation()
     : mParticleSystem(100, {GAME_SIZE_X, GAME_SIZE_Y}, 5.f),
@@ -23,7 +24,7 @@ void FluidSimulation::processEvents()
 
 void FluidSimulation::update()
 {
-    mParticleSystem.update(DELTA_TIME, GRAVITY, COLLISION_DAMPING, {GAME_SIZE_X, GAME_SIZE_Y});
+    mParticleSystem.update(DELTA_TIME, {GAME_SIZE_X, GAME_SIZE_Y});
 }
 
 void FluidSimulation::render()

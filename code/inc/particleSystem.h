@@ -10,12 +10,11 @@ class ParticleSystem
 public:
     ParticleSystem(unsigned int aNumParticles, const sf::Vector2u &aWindowSize, float aParticleRadius);
 
-    void update(float aDeltaTime, float aGravity, float aCollisionDamping, const sf::Vector2u &aWindowSize);
+    void update(float aDeltaTime, const sf::Vector2u &aWindowSize);
     const std::vector<Particle>& getParticles() const;
 
 private:
     std::vector<Particle> mParticles;
-    float mParticleRadius;
 };
 
 #endif // PARTICLE_SYSTEM_H

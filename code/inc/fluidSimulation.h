@@ -5,9 +5,7 @@
 #include "particleSystem.h"
 #include "renderer.h"
 
-#define GRAVITY 9.8f
 #define DELTA_TIME 0.1f
-#define COLLISION_DAMPING 0.8f
 #define GAME_SIZE_X 1920
 #define GAME_SIZE_Y 1080
 
