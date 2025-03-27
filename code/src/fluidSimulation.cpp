@@ -98,9 +98,10 @@ void FluidSimulation::showUI()
         }
     }
 
-    // Particle count 
+    // Particle count
     if (ImGui::InputInt("Particle Count", (int *)&mParticleCount))
     {
+        mPaused = true;
         if (mParticleCount < 1)
         {
             mParticleCount = 1;
@@ -129,6 +130,7 @@ void FluidSimulation::showUI()
     // Particle spacing
     if (ImGui::InputInt("Particle Spacing", &mParticleSpacing))
     {
+        mPaused = true;
         if (mParticleSpacing < 1)
         {
             mParticleSpacing = 1;
