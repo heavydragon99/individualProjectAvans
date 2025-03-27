@@ -7,7 +7,7 @@ SimulationConfig &SimulationConfig::getInstance()
 }
 
 SimulationConfig::SimulationConfig()
-    : mPaused(true), mParticleCount(1000), mParticleRadius(1.f), mSimulationSpeed(5), mParticleSpacing(3), mGameSize({1920, 1080}), mWindowSize({1920, 1080}), mSmoothingRadius(10) {}
+    : mPaused(true), mParticleCount(100), mParticleRadius(20.f), mSimulationSpeed(5), mParticleSpacing(50), mGameSize({1920, 1080}), mWindowSize({1920, 1080}), mSmoothingRadius(200), mTargetDensity(0.1), mPressureMultiplier(100) {}
 
 bool SimulationConfig::paused() const { return mPaused; }
 void SimulationConfig::paused(bool paused) { mPaused = paused; }
@@ -53,6 +53,12 @@ void SimulationConfig::windowSize(const sf::Vector2u &aSize) { mWindowSize = aSi
 
 float SimulationConfig::smoothingRadius() const { return mSmoothingRadius; }
 void SimulationConfig::smoothingRadius(float aRadius) { mSmoothingRadius = aRadius; }
+
+float SimulationConfig::targetDensity() const { return mTargetDensity; }
+void SimulationConfig::targetDensity(float aDensity) { mTargetDensity = aDensity; }
+
+float SimulationConfig::pressureMultiplier() const { return mPressureMultiplier; }
+void SimulationConfig::pressureMultiplier(float aMultiplier) { mPressureMultiplier = aMultiplier; }
 
 void SimulationConfig::setOnParticleCountChanged(const std::function<void()> &callback) { onParticleCountChanged = callback; }
 void SimulationConfig::setOnParticleRadiusChanged(const std::function<void()> &callback) { onParticleRadiusChanged = callback; }

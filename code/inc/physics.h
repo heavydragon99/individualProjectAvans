@@ -24,12 +24,19 @@ public:
 private:
     void applyGravity(sf::Time aDeltaTime);
     void checkBoundary();
+    void updateDensities();
+    void updateForces(sf::Time aDeltaTime);
 
     float smoothingKernel(float aRadius, float aDistance);
+    float smoothingKernelDerivative(float aRadius, float aDistance);
     float calculateDensity(int aParticleIndex);
+    sf::Vector2f calculatePressureForce(int aParticleIndex);
+    float convertDensityToPressure(float aDensity);
+    float calculateSharedPressure(float aDensityA, float aDensityB);
 
 private:
     std::vector<Particle> &mParticles;
+    std::vector<float> mDensities;
 };
 
 #endif // PHYSICS_H

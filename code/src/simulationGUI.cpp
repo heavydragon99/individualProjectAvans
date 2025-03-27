@@ -78,9 +78,33 @@ void SimulationGUI::renderControls()
         if (smoothingRadius < 1.f) {
             smoothingRadius = 1.f;
         }
-        if (smoothingRadius > 100.f) {
-            smoothingRadius = 100.f;
+        if (smoothingRadius > 10000.f) {
+            smoothingRadius = 10000.f;
         }
         config.smoothingRadius(smoothingRadius);
+    }
+
+    // Target density
+    float targetDensity = config.targetDensity();
+    if (ImGui::InputFloat("Target Density", &targetDensity)) {
+        if (targetDensity < 0.01f) {
+            targetDensity = 1.f;
+        }
+        if (targetDensity > 100.f) {
+            targetDensity = 100.f;
+        }
+        config.targetDensity(targetDensity);
+    }
+
+    // Pressure multiplier
+    float pressureMultiplier = config.pressureMultiplier();
+    if (ImGui::InputFloat("Pressure Multiplier", &pressureMultiplier)) {
+        if (pressureMultiplier < 0.5f) {
+            pressureMultiplier = 0.5f;
+        }
+        if (pressureMultiplier > 10000.f) {
+            pressureMultiplier = 10000.f;
+        }
+        config.pressureMultiplier(pressureMultiplier);
     }
 }

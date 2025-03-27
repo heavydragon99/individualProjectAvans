@@ -34,6 +34,12 @@ public:
     float smoothingRadius() const;
     void smoothingRadius(float aRadius);
 
+    float targetDensity() const;
+    void targetDensity(float aDensity);
+
+    float pressureMultiplier() const;
+    void pressureMultiplier(float aMultiplier);
+
     // Callback setters
     void setOnParticleCountChanged(const std::function<void()> &callback);
     void setOnParticleRadiusChanged(const std::function<void()> &callback);
@@ -53,6 +59,8 @@ private:
     sf::Vector2u mGameSize;
     sf::Vector2u mWindowSize;
     float mSmoothingRadius;
+    float mTargetDensity;
+    float mPressureMultiplier;
 
     // Callbacks
     std::function<void()> onParticleCountChanged;

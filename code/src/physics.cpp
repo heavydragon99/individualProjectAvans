@@ -4,6 +4,7 @@
 
 #include <cmath>
 #include <algorithm>
+#include <random>
 
 extern "C"
 {
@@ -13,19 +14,21 @@ extern "C"
     }
 }
 
-Physics::Physics(std::vector<Particle>& aParticles): mParticles(aParticles) {}
+Physics::Physics(std::vector<Particle> &aParticles) : mParticles(aParticles) {}
 
 void Physics::update(sf::Time aDeltaTime)
 {
     applyGravity(aDeltaTime);
+    updateDensities();
     checkBoundary();
+    updateForces(aDeltaTime);
 }
 
 void Physics::applyGravity(sf::Time aDeltaTime)
 {
     for (auto &particle : mParticles)
     {
-        particle.mVelocity.y += GRAVITY * aDeltaTime.asSeconds();   // Apply gravity.
+        particle.mVelocity.y += GRAVITY * aDeltaTime.asSeconds();          // Apply gravity.
         particle.mPosition += particle.mVelocity * aDeltaTime.asSeconds(); // Update position.
     }
 }
@@ -59,13 +62,48 @@ void Physics::checkBoundary()
     }
 }
 
-float Physics::smoothingKernel(float aRadius, float aDistance){
-    float volume = M_PI * std::pow(aRadius, 8) / 4;
-    float value = std::max(0.0f, aRadius * aRadius - aDistance * aDistance);
-    return value * value * value / volume;
+void Physics::updateDensities()
+{
+    mDensities.clear();
+    for (size_t particleIndex = 0; particleIndex < mParticles.size(); ++particleIndex)
+    {
+        mDensities.push_back(calculateDensity(particleIndex));
+    }
 }
 
-float Physics::calculateDensity(int aParticleIndex){
+void Physics::updateForces(sf::Time aDeltaTime)
+{
+    for (size_t particleIndex = 0; particleIndex < mParticles.size(); ++particleIndex)
+    {
+        sf::Vector2f pressureForce = calculatePressureForce(particleIndex);
+        sf::Vector2f pressureAcceleration = pressureForce / mDensities[particleIndex];
+        mParticles[particleIndex].mVelocity += pressureAcceleration * aDeltaTime.asSeconds();
+    }
+}
+
+float Physics::smoothingKernel(float aRadius, float aDistance)
+{
+    if (aDistance >= aRadius)
+    {
+        return 0.0f;
+    }
+
+    float volume =(M_PI * std::pow(aRadius, 4)) / 6;
+    return (aRadius - aDistance) * (aRadius - aDistance) / volume;
+}
+
+float Physics::smoothingKernelDerivative(float aRadius, float aDistance)
+{
+    if (aDistance >= aRadius)
+    {
+        return 0.0f;
+    }
+    float scale = 12 / (std::pow(aRadius, 4) * M_PI);
+    return (aDistance - aRadius) * scale;
+}
+
+float Physics::calculateDensity(int aParticleIndex)
+{
     float density = 0.0f;
     const float mass = 10.0f;
 
@@ -78,4 +116,62 @@ float Physics::calculateDensity(int aParticleIndex){
         density += mass * influence;
     }
     return density;
+}
+
+sf::Vector2f Physics::calculatePressureForce(int aParticleIndex)
+{
+    const float mass = 10.0f;
+    sf::Vector2f pressureForce{0.0f, 0.0f};
+    int radius = SimulationConfig::getInstance().smoothingRadius();
+    for (size_t otherParticleIndex = 0; otherParticleIndex < mParticles.size(); ++otherParticleIndex)
+    {
+        if (otherParticleIndex == aParticleIndex)
+        {
+            continue;
+        }
+        sf::Vector2f offset = mParticles[otherParticleIndex].mPosition - mParticles[aParticleIndex].mPosition;
+        float distance = std::hypot(offset.x, offset.y);
+        sf::Vector2f direction{0.0f, 0.0f};
+        if (distance == 0.0f)
+        {
+            while (direction == sf::Vector2f{0.0f, 0.0f})
+            {
+                // Generate a random direction
+                std::random_device rd;
+                std::mt19937 gen(rd());
+                std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
+
+                float randomX = dist(gen);
+                float randomY = dist(gen);
+
+                // Normalize the random vector
+                float magnitude = std::sqrt(randomX * randomX + randomY * randomY);
+                direction = magnitude == 0.0f ? sf::Vector2f{0.0f, 0.0f} : sf::Vector2f{randomX / magnitude, randomY / magnitude};
+            }
+        }
+        else
+        {
+            direction = offset / distance;
+        }
+        float slope = smoothingKernelDerivative(radius, distance);
+        float density = mDensities[otherParticleIndex];
+        float sharedPressure = calculateSharedPressure(mDensities[aParticleIndex], density);
+        pressureForce += -sharedPressure * direction * slope * mass / density;
+    }
+
+    return pressureForce;
+}
+
+float Physics::convertDensityToPressure(float aDensity)
+{
+    float densityError = aDensity - SimulationConfig::getInstance().targetDensity();
+    float pressure = SimulationConfig::getInstance().pressureMultiplier() * densityError;
+    return pressure;
+}
+
+float Physics::calculateSharedPressure(float aDensityA, float aDensityB)
+{
+    float pressureA = convertDensityToPressure(aDensityA);
+    float pressureB = convertDensityToPressure(aDensityB);
+    return (pressureA + pressureB) / 2;
 }
