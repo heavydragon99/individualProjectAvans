@@ -2,8 +2,8 @@
 
 #include <iostream>
 
-Renderer::Renderer(float particleRadius, const sf::Vector2u &gameSize)
-    : mParticleRadius(particleRadius), mGameSize(gameSize), mWindowSize(getScreenSize()), mWindow(sf::VideoMode(getScreenSize()), "Fluid Simulation")
+Renderer::Renderer(const sf::Vector2u &gameSize)
+    : mGameSize(gameSize), mWindowSize(getScreenSize()), mWindow(sf::VideoMode(getScreenSize()), "Fluid Simulation")
 {
     mWindow.setFramerateLimit(60);
 
@@ -24,14 +24,15 @@ Renderer::Renderer(float particleRadius, const sf::Vector2u &gameSize)
 
 void Renderer::draw(sf::RenderTarget &target, const ParticleSystem &particleSystem)
 {
-    sf::CircleShape shape(mParticleRadius);
-    shape.setFillColor(sf::Color::White);
-    shape.setOrigin({mParticleRadius, mParticleRadius});
+    sf::CircleShape particle;
+    particle.setFillColor(sf::Color::White);
 
     for (const auto &p : particleSystem.getParticles())
     {
-        shape.setPosition(p.mPosition);
-        target.draw(shape);
+        particle.setRadius(p.mRadius);
+        particle.setOrigin({p.mRadius, p.mRadius});
+        particle.setPosition(p.mPosition);
+        target.draw(particle);
     }
 
     // Draw a red line of 1 game unit around the edge

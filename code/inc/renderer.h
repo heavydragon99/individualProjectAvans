@@ -7,7 +7,7 @@
 class Renderer
 {
 public:
-    Renderer(float particleRadius, const sf::Vector2u &gameSize);
+    Renderer(const sf::Vector2u &gameSize);
 
     void draw(sf::RenderTarget &target, const ParticleSystem &particleSystem);
     void render(ParticleSystem &particleSystem);
@@ -17,7 +17,6 @@ public:
     sf::RenderWindow &getWindow() { return mWindow; }
 
 private:
-    float mParticleRadius;
     sf::Vector2u mGameSize;
     sf::Vector2u mWindowSize;
     sf::RenderWindow mWindow;

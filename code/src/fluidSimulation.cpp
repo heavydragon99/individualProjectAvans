@@ -4,12 +4,12 @@
 #include <SFML/Window/Event.hpp>
 
 FluidSimulation::FluidSimulation()
-    : mPaused(false),
+    : mPaused(true),
       mParticleCount(100),
       mParticleRadius(5.f),
       mSimulationSpeed(1),
       mParticleSystem(mParticleCount, {GAME_SIZE_X, GAME_SIZE_Y}, mParticleRadius),
-      mRenderer(5.f, {GAME_SIZE_X, GAME_SIZE_Y})
+      mRenderer({GAME_SIZE_X, GAME_SIZE_Y})
 {
     if (!ImGui::SFML::Init(mRenderer.getWindow()))
     {
@@ -87,12 +87,13 @@ void FluidSimulation::showUI()
     // Particle count slider
     if (ImGui::SliderInt("Particle Count", (int *)&mParticleCount, 1, 1000))
     {
-        mParticleSystem = ParticleSystem(mParticleCount, {GAME_SIZE_X, GAME_SIZE_Y}, mParticleRadius);
+        mParticleSystem.setParticleCount(mParticleCount);
     }
 
     // Particle radius slider
     if (ImGui::SliderFloat("Particle Radius", &mParticleRadius, 1.f, 20.f))
     {
+        mParticleSystem.setParticleRadius(mParticleRadius);
     }
 
     ImGui::End();

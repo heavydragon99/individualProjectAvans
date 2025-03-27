@@ -12,9 +12,15 @@ public:
 
     void update(sf::Time aDeltaTime, const sf::Vector2u &aWindowSize);
     const std::vector<Particle>& getParticles() const;
+    void setParticleCount(unsigned int aNumParticles);
+    void setParticleRadius(float aParticleRadius);
 
 private:
+    void spawnParticles(unsigned int aNumParticles, const sf::Vector2u &aWindowSize, float aParticleRadius);
+
     std::vector<Particle> mParticles;
+    sf::Vector2u mWindowSize;
+
 };
 
 #endif // PARTICLE_SYSTEM_H

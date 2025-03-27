@@ -2,8 +2,37 @@
 #include "physics.h"
 #include <cmath>
 
-ParticleSystem::ParticleSystem(unsigned int aNumParticles, const sf::Vector2u &aWindowSize, float aParticleRadius)
+ParticleSystem::ParticleSystem(unsigned int aNumParticles, const sf::Vector2u &aWindowSize, float aParticleRadius) : mWindowSize(aWindowSize)
 {
+    spawnParticles(aNumParticles, aWindowSize, aParticleRadius);
+}
+
+void ParticleSystem::update(sf::Time aDeltaTime, const sf::Vector2u &aWindowSize)
+{
+    updateParticles(mParticles, aDeltaTime, aWindowSize);
+}
+
+const std::vector<Particle> &ParticleSystem::getParticles() const
+{
+    return mParticles;
+}
+
+void ParticleSystem::setParticleCount(unsigned int aNumParticles)
+{
+    float radius = mParticles.front().mRadius;
+    mParticles.clear();
+    spawnParticles(aNumParticles, mWindowSize, radius);
+}
+
+void ParticleSystem::setParticleRadius(float aParticleRadius)
+{
+    for (auto &p : mParticles)
+    {
+        p.mRadius = aParticleRadius;
+    }
+}
+
+void ParticleSystem::spawnParticles(unsigned int aNumParticles, const sf::Vector2u &aWindowSize, float aParticleRadius){
     // Create a grid of particles.
     int particlesPerRow = static_cast<int>(std::sqrt(aNumParticles));
     int particlesPerColumn = (aNumParticles - 1) / particlesPerRow + 1;
@@ -20,14 +49,4 @@ ParticleSystem::ParticleSystem(unsigned int aNumParticles, const sf::Vector2u &a
         float y = (i / particlesPerRow - particlesPerColumn * 0.5f + 0.5f) * spacing + offsetY;
         mParticles.emplace_back(sf::Vector2f(x, y), sf::Vector2f(0.f, 0.f), aParticleRadius);
     }
-}
-
-void ParticleSystem::update(sf::Time aDeltaTime, const sf::Vector2u &aWindowSize)
-{
-    updateParticles(mParticles, aDeltaTime, aWindowSize);
-}
-
-const std::vector<Particle>& ParticleSystem::getParticles() const
-{
-    return mParticles;
 }
