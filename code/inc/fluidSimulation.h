@@ -30,6 +30,7 @@ private:
     unsigned int mParticleCount;
     float mParticleRadius;
     int mSimulationSpeed;
+    int mParticleSpacing;
 
     sf::Clock mDeltaClock;
     sf::Time mDeltaTime;

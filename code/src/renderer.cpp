@@ -26,11 +26,10 @@ void Renderer::draw(sf::RenderTarget &target, const ParticleSystem &particleSyst
 {
     sf::CircleShape particle;
     particle.setFillColor(sf::Color::White);
-
+    particle.setRadius(particleSystem.getParticles().front().mRadius);
+    particle.setOrigin({particleSystem.getParticles().front().mRadius, particleSystem.getParticles().front().mRadius});
     for (const auto &p : particleSystem.getParticles())
     {
-        particle.setRadius(p.mRadius);
-        particle.setOrigin({p.mRadius, p.mRadius});
         particle.setPosition(p.mPosition);
         target.draw(particle);
     }

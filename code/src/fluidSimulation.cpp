@@ -7,8 +7,9 @@ FluidSimulation::FluidSimulation()
     : mPaused(true),
       mParticleCount(100),
       mParticleRadius(5.f),
-      mSimulationSpeed(1),
-      mParticleSystem(mParticleCount, {GAME_SIZE_X, GAME_SIZE_Y}, mParticleRadius),
+      mSimulationSpeed(5),
+      mParticleSpacing(15),
+      mParticleSystem(mParticleCount, {GAME_SIZE_X, GAME_SIZE_Y}, mParticleRadius, mParticleSpacing),
       mRenderer({GAME_SIZE_X, GAME_SIZE_Y})
 {
     if (!ImGui::SFML::Init(mRenderer.getWindow()))
@@ -73,29 +74,73 @@ void FluidSimulation::render()
 void FluidSimulation::showUI()
 {
     ImGui::SFML::Update(mRenderer.getWindow(), mDeltaTime);
-    ImGui::Begin("Simulation Controls");
 
+    ImGui::SetNextWindowSize({250, 0.0f}, ImGuiCond_Always);
+    ImGui::Begin("Simulation Controls");
+    ImGui::PushItemWidth(100);
+
+    // Pause/Resume button
     if (ImGui::Button(mPaused ? "Resume" : "Pause"))
     {
         mPaused = !mPaused;
     }
 
-    if(ImGui::SliderInt("Simulation Speed", &mSimulationSpeed, 1, 10))
+    // Simulation speed
+    if (ImGui::InputInt("Simulation Speed", &mSimulationSpeed))
     {
+        if (mSimulationSpeed < 1)
+        {
+            mSimulationSpeed = 1;
+        }
+        if (mSimulationSpeed > 10)
+        {
+            mSimulationSpeed = 10;
+        }
     }
 
-    // Particle count slider
-    if (ImGui::SliderInt("Particle Count", (int *)&mParticleCount, 1, 1000))
+    // Particle count 
+    if (ImGui::InputInt("Particle Count", (int *)&mParticleCount))
     {
+        if (mParticleCount < 1)
+        {
+            mParticleCount = 1;
+        }
+        if (mParticleCount > 100000)
+        {
+            mParticleCount = 100000;
+        }
         mParticleSystem.setParticleCount(mParticleCount);
     }
 
-    // Particle radius slider
-    if (ImGui::SliderFloat("Particle Radius", &mParticleRadius, 1.f, 20.f))
+    // Particle radius
+    if (ImGui::InputFloat("Particle Radius", &mParticleRadius))
     {
+        if (mParticleRadius < 0.1f)
+        {
+            mParticleRadius = 0.1f;
+        }
+        if (mParticleRadius > 20.f)
+        {
+            mParticleRadius = 20.f;
+        }
         mParticleSystem.setParticleRadius(mParticleRadius);
     }
 
+    // Particle spacing
+    if (ImGui::InputInt("Particle Spacing", &mParticleSpacing))
+    {
+        if (mParticleSpacing < 1)
+        {
+            mParticleSpacing = 1;
+        }
+        if (mParticleSpacing > 100)
+        {
+            mParticleSpacing = 100;
+        }
+        mParticleSystem.setParticleSpacing(mParticleSpacing);
+    }
+
+    ImGui::PopItemWidth();
     ImGui::End();
     ImGui::SFML::Render(mRenderer.getWindow());
 }

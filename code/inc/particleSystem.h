@@ -8,19 +8,20 @@
 class ParticleSystem
 {
 public:
-    ParticleSystem(unsigned int aNumParticles, const sf::Vector2u &aWindowSize, float aParticleRadius);
+    ParticleSystem(unsigned int aNumParticles, const sf::Vector2u &aWindowSize, float aParticleRadius, float aParticleSpacing);
 
     void update(sf::Time aDeltaTime, const sf::Vector2u &aWindowSize);
     const std::vector<Particle>& getParticles() const;
     void setParticleCount(unsigned int aNumParticles);
     void setParticleRadius(float aParticleRadius);
+    void setParticleSpacing(float aParticleSpacing);
 
 private:
     void spawnParticles(unsigned int aNumParticles, const sf::Vector2u &aWindowSize, float aParticleRadius);
 
     std::vector<Particle> mParticles;
     sf::Vector2u mWindowSize;
-
+    float mParticleSpacing; // New member variable for particle spacing
 };
 
 #endif // PARTICLE_SYSTEM_H
