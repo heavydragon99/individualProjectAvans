@@ -5,12 +5,13 @@
 ParticleSystem::ParticleSystem(unsigned int aNumParticles, const sf::Vector2u &aWindowSize, float aParticleRadius, float aParticleSpacing) 
     : mWindowSize(aWindowSize), mParticleSpacing(aParticleSpacing)
 {
+    mPhysicsEngine = std::make_unique<Physics>(mParticles);
     spawnParticles(aNumParticles, aWindowSize, aParticleRadius);
 }
 
 void ParticleSystem::update(sf::Time aDeltaTime, const sf::Vector2u &aWindowSize)
 {
-    updateParticles(mParticles, aDeltaTime, aWindowSize);
+    mPhysicsEngine->update(aDeltaTime, aWindowSize);
 }
 
 const std::vector<Particle> &ParticleSystem::getParticles() const

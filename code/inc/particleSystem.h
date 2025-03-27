@@ -3,7 +3,10 @@
 
 #include <vector>
 #include <SFML/System/Clock.hpp>
+#include <memory>
+
 #include "particle.h"
+#include "physics.h"
 
 class ParticleSystem
 {
@@ -22,6 +25,8 @@ private:
     std::vector<Particle> mParticles;
     sf::Vector2u mWindowSize;
     float mParticleSpacing; // New member variable for particle spacing
+
+    std::unique_ptr<Physics> mPhysicsEngine;
 };
 
 #endif // PARTICLE_SYSTEM_H
