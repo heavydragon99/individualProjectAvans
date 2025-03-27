@@ -7,7 +7,7 @@ SimulationConfig &SimulationConfig::getInstance()
 }
 
 SimulationConfig::SimulationConfig()
-    : mPaused(true), mParticleCount(10000), mParticleRadius(1.f), mSimulationSpeed(5), mParticleSpacing(1), mGameSize({1920, 1080}), mWindowSize({1920, 1080}), mSmoothingRadius(10) {}
+    : mPaused(true), mParticleCount(1000), mParticleRadius(1.f), mSimulationSpeed(5), mParticleSpacing(3), mGameSize({1920, 1080}), mWindowSize({1920, 1080}), mSmoothingRadius(10) {}
 
 bool SimulationConfig::paused() const { return mPaused; }
 void SimulationConfig::paused(bool paused) { mPaused = paused; }

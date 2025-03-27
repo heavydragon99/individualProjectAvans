@@ -15,10 +15,6 @@ extern "C"
 
 Physics::Physics(std::vector<Particle>& aParticles): mParticles(aParticles) {}
 
-float Physics::calculateDensityTEMP(int aParticleIndex){
-    return calculateDensity(aParticleIndex);
-}
-
 void Physics::update(sf::Time aDeltaTime)
 {
     updateParticles(aDeltaTime);

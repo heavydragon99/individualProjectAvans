@@ -30,27 +30,11 @@ void Renderer::draw(sf::RenderTarget &target, const ParticleSystem &particleSyst
     particle.setFillColor(sf::Color::White);
     particle.setRadius(particleSystem.getParticles().front().mRadius);
     particle.setOrigin({particleSystem.getParticles().front().mRadius, particleSystem.getParticles().front().mRadius});
-    int i = 0;
-    sf::CircleShape smoothingRadius(SimulationConfig::getInstance().smoothingRadius());
     for (const auto &p : particleSystem.getParticles())
     {
-        if(i == 5150){
-            particle.setFillColor(sf::Color::Red);
-            
-            smoothingRadius.setFillColor(sf::Color::Transparent);
-            smoothingRadius.setOutlineColor(sf::Color::Blue);
-            smoothingRadius.setOutlineThickness(3);
-            smoothingRadius.setOrigin({SimulationConfig::getInstance().smoothingRadius(), SimulationConfig::getInstance().smoothingRadius()});
-            smoothingRadius.setPosition(p.mPosition);
-            
-        }else{
-            particle.setFillColor(sf::Color::White);
-        }
-        i++;
         particle.setPosition(p.mPosition);
         target.draw(particle);
     }
-    target.draw(smoothingRadius);
 
     // Draw a red line of 1 game unit around the edge
     sf::RectangleShape border(sf::Vector2f(SimulationConfig::getInstance().gameSize().x - 2, SimulationConfig::getInstance().gameSize().y - 2));

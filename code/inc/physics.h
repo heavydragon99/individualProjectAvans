@@ -18,7 +18,6 @@ class Physics
 {
 public:
     Physics(std::vector<Particle>& aParticles);
-    float calculateDensityTEMP(int aParticleIndex);
 
     void update(sf::Time aDeltaTime);
 

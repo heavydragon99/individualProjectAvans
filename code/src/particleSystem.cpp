@@ -21,11 +21,6 @@ ParticleSystem::ParticleSystem()
     spawnParticles();
 }
 
-float ParticleSystem::calculateDensityTEMP(int aParticleIndex)
-{
-    return mPhysicsEngine->calculateDensityTEMP(aParticleIndex);
-}
-
 void ParticleSystem::update(sf::Time aDeltaTime)
 {
     mPhysicsEngine->update(aDeltaTime);

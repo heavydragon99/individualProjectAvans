@@ -19,10 +19,6 @@ void SimulationGUI::renderControls()
 {
     auto &config = SimulationConfig::getInstance();
 
-    // Temp string
-    std::string string = std::to_string(static_cast<int>(SimulationConfig::getInstance().densityTEMP() * 10) / 10.0f);
-    ImGui::Text(string.c_str());
-
     // Pause/Resume button
     if (ImGui::Button(config.paused() ? "Resume" : "Pause")) {
         config.paused(!config.paused());
