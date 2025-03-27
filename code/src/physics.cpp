@@ -17,17 +17,24 @@ Physics::Physics(std::vector<Particle>& aParticles): mParticles(aParticles) {}
 
 void Physics::update(sf::Time aDeltaTime)
 {
-    updateParticles(aDeltaTime);
+    applyGravity(aDeltaTime);
+    checkBoundary();
 }
 
-void Physics::updateParticles(sf::Time aDeltaTime)
+void Physics::applyGravity(sf::Time aDeltaTime)
 {
-    const sf::Vector2u windowSize = SimulationConfig::getInstance().windowSize();
     for (auto &particle : mParticles)
     {
         particle.mVelocity.y += GRAVITY * aDeltaTime.asSeconds();   // Apply gravity.
         particle.mPosition += particle.mVelocity * aDeltaTime.asSeconds(); // Update position.
+    }
+}
 
+void Physics::checkBoundary()
+{
+    const sf::Vector2u windowSize = SimulationConfig::getInstance().windowSize();
+    for (auto &particle : mParticles)
+    {
         // Simple boundary collision detection.
         if (particle.mPosition.x < particle.mRadius)
         {

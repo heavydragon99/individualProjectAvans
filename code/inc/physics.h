@@ -22,7 +22,8 @@ public:
     void update(sf::Time aDeltaTime);
 
 private:
-    void updateParticles(sf::Time aDeltaTime);
+    void applyGravity(sf::Time aDeltaTime);
+    void checkBoundary();
 
     float smoothingKernel(float aRadius, float aDistance);
     float calculateDensity(int aParticleIndex);
