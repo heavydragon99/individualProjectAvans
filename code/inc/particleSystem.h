@@ -12,6 +12,7 @@ class ParticleSystem
 {
 public:
     ParticleSystem();
+    float calculateDensityTEMP(int aParticleIndex);
 
     void update(sf::Time aDeltaTime);
     const std::vector<Particle>& getParticles() const;

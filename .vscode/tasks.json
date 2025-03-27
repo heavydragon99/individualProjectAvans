@@ -13,7 +13,7 @@
         "cwd": "${workspaceFolder}/code/build"
       },
       "type": "shell",
-      "command": "cmake ..",
+      "command": "cmake -DCMAKE_BUILD_TYPE=Debug ..",
       "problemMatcher": ["$gcc"],
       "dependsOn": "Ensure Build Folder"
     },

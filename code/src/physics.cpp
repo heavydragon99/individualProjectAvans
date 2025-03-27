@@ -15,6 +15,10 @@ extern "C"
 
 Physics::Physics(std::vector<Particle>& aParticles): mParticles(aParticles) {}
 
+float Physics::calculateDensityTEMP(int aParticleIndex){
+    return calculateDensity(aParticleIndex);
+}
+
 void Physics::update(sf::Time aDeltaTime)
 {
     updateParticles(aDeltaTime);
@@ -23,49 +27,51 @@ void Physics::update(sf::Time aDeltaTime)
 void Physics::updateParticles(sf::Time aDeltaTime)
 {
     const sf::Vector2u windowSize = SimulationConfig::getInstance().windowSize();
-    for (auto &p : mParticles)
+    for (auto &particle : mParticles)
     {
-        p.mVelocity.y += GRAVITY * aDeltaTime.asSeconds();   // Apply gravity.
-        p.mPosition += p.mVelocity * aDeltaTime.asSeconds(); // Update position.
+        particle.mVelocity.y += GRAVITY * aDeltaTime.asSeconds();   // Apply gravity.
+        particle.mPosition += particle.mVelocity * aDeltaTime.asSeconds(); // Update position.
 
         // Simple boundary collision detection.
-        if (p.mPosition.x < p.mRadius)
+        if (particle.mPosition.x < particle.mRadius)
         {
-            p.mPosition.x = p.mRadius;
-            p.mVelocity.x = -p.mVelocity.x * COLLISION_DAMPING;
+            particle.mPosition.x = particle.mRadius;
+            particle.mVelocity.x = -particle.mVelocity.x * COLLISION_DAMPING;
         }
-        else if (p.mPosition.x > windowSize.x - p.mRadius)
+        else if (particle.mPosition.x > windowSize.x - particle.mRadius)
         {
-            p.mPosition.x = windowSize.x - p.mRadius;
-            p.mVelocity.x = -p.mVelocity.x * COLLISION_DAMPING;
+            particle.mPosition.x = windowSize.x - particle.mRadius;
+            particle.mVelocity.x = -particle.mVelocity.x * COLLISION_DAMPING;
         }
-        if (p.mPosition.y < p.mRadius)
+        if (particle.mPosition.y < particle.mRadius)
         {
-            p.mPosition.y = p.mRadius;
-            p.mVelocity.y = -p.mVelocity.y * COLLISION_DAMPING;
+            particle.mPosition.y = particle.mRadius;
+            particle.mVelocity.y = -particle.mVelocity.y * COLLISION_DAMPING;
         }
-        else if (p.mPosition.y > windowSize.y - p.mRadius)
+        else if (particle.mPosition.y > windowSize.y - particle.mRadius)
         {
-            p.mPosition.y = windowSize.y - p.mRadius;
-            p.mVelocity.y = -p.mVelocity.y * COLLISION_DAMPING;
+            particle.mPosition.y = windowSize.y - particle.mRadius;
+            particle.mVelocity.y = -particle.mVelocity.y * COLLISION_DAMPING;
         }
     }
 }
 
 float Physics::smoothingKernel(float aRadius, float aDistance){
+    float volume = M_PI * std::pow(aRadius, 8) / 4;
     float value = std::max(0.0f, aRadius * aRadius - aDistance * aDistance);
-    return value * value * value;
+    return value * value * value / volume;
 }
 
-float Physics::calculateDensity(const Particle &aParticle){
+float Physics::calculateDensity(int aParticleIndex){
     float density = 0.0f;
-    const float mass = 1.0f;
+    const float mass = 10.0f;
 
-
-    for (const auto &p : mParticles)
+    float smoothingRadius = SimulationConfig::getInstance().smoothingRadius();
+    Particle &sampleParticle = mParticles[aParticleIndex];
+    for (const auto &otherParticle : mParticles)
     {
-        float distance = std::hypot(p.mPosition.x - aParticle.mPosition.x, p.mPosition.y - aParticle.mPosition.y);
-        float influence = smoothingKernel(SMOOTHING_RADIUS, distance);
+        float distance = std::hypot(otherParticle.mPosition.x - sampleParticle.mPosition.x, otherParticle.mPosition.y - sampleParticle.mPosition.y);
+        float influence = smoothingKernel(smoothingRadius, distance);
         density += mass * influence;
     }
     return density;

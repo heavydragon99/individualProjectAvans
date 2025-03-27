@@ -59,6 +59,7 @@ void FluidSimulation::update()
     {
         mParticleSystem.update(mDeltaTime);
     }
+    SimulationConfig::getInstance().densityTEMP(mParticleSystem.calculateDensityTEMP(5150));
 }
 
 void FluidSimulation::render()

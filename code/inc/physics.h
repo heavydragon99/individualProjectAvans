@@ -8,7 +8,6 @@
 
 #define GRAVITY 9.8f
 #define COLLISION_DAMPING 0.8f
-#define SMOOTHING_RADIUS 50.0f
 
 extern "C"
 {
@@ -19,6 +18,7 @@ class Physics
 {
 public:
     Physics(std::vector<Particle>& aParticles);
+    float calculateDensityTEMP(int aParticleIndex);
 
     void update(sf::Time aDeltaTime);
 
@@ -26,7 +26,7 @@ private:
     void updateParticles(sf::Time aDeltaTime);
 
     float smoothingKernel(float aRadius, float aDistance);
-    float calculateDensity(const Particle &aParticle);
+    float calculateDensity(int aParticleIndex);
 
 private:
     std::vector<Particle> &mParticles;

@@ -7,7 +7,7 @@ SimulationConfig &SimulationConfig::getInstance()
 }
 
 SimulationConfig::SimulationConfig()
-    : mPaused(true), mParticleCount(100), mParticleRadius(5.f), mSimulationSpeed(5), mParticleSpacing(15), mGameSize({1920, 1080}), mWindowSize({1920, 1080}) {}
+    : mPaused(true), mParticleCount(10000), mParticleRadius(1.f), mSimulationSpeed(5), mParticleSpacing(1), mGameSize({1920, 1080}), mWindowSize({1920, 1080}), mSmoothingRadius(10) {}
 
 bool SimulationConfig::paused() const { return mPaused; }
 void SimulationConfig::paused(bool paused) { mPaused = paused; }
@@ -50,6 +50,9 @@ void SimulationConfig::gameSize(const sf::Vector2u &aSize) { mGameSize = aSize; 
 
 sf::Vector2u SimulationConfig::windowSize() const { return mWindowSize; }
 void SimulationConfig::windowSize(const sf::Vector2u &aSize) { mWindowSize = aSize; }
+
+float SimulationConfig::smoothingRadius() const { return mSmoothingRadius; }
+void SimulationConfig::smoothingRadius(float aRadius) { mSmoothingRadius = aRadius; }
 
 void SimulationConfig::setOnParticleCountChanged(const std::function<void()> &callback) { onParticleCountChanged = callback; }
 void SimulationConfig::setOnParticleRadiusChanged(const std::function<void()> &callback) { onParticleRadiusChanged = callback; }

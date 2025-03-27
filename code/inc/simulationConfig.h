@@ -31,6 +31,12 @@ public:
     sf::Vector2u windowSize() const;
     void windowSize(const sf::Vector2u &aSize);
 
+    float smoothingRadius() const;
+    void smoothingRadius(float aRadius);
+
+    float densityTEMP() const{ return mDensityTEMP; };
+    void densityTEMP(float aDensity) { mDensityTEMP = aDensity; };
+
     // Callback setters
     void setOnParticleCountChanged(const std::function<void()> &callback);
     void setOnParticleRadiusChanged(const std::function<void()> &callback);
@@ -49,6 +55,8 @@ private:
     int mParticleSpacing;
     sf::Vector2u mGameSize;
     sf::Vector2u mWindowSize;
+    float mSmoothingRadius;
+    float mDensityTEMP;
 
     // Callbacks
     std::function<void()> onParticleCountChanged;
