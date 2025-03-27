@@ -8,9 +8,7 @@
 #include <SFML/System/Clock.hpp>
 #include <imgui.h>
 #include <imgui-SFML.h>
-
-#define GAME_SIZE_X 1920
-#define GAME_SIZE_Y 1080
+#include "simulationGUI.h"
 
 class FluidSimulation
 {
@@ -25,17 +23,11 @@ private:
     void render();
     void showUI();
 
-    // Simulation Parameters
-    bool mPaused ;
-    unsigned int mParticleCount;
-    float mParticleRadius;
-    int mSimulationSpeed;
-    int mParticleSpacing;
-
     sf::Clock mDeltaClock;
     sf::Time mDeltaTime;
     ParticleSystem mParticleSystem;
     Renderer mRenderer;
+    SimulationGUI mGUI;
 };
 
 #endif // FLUID_SIMULATION_H

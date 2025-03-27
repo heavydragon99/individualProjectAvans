@@ -1,16 +1,11 @@
 #include "fluidSimulation.h"
 
 #include "physics.h"
+#include "simulationConfig.h"
+
 #include <SFML/Window/Event.hpp>
 
 FluidSimulation::FluidSimulation()
-    : mPaused(true),
-      mParticleCount(100),
-      mParticleRadius(5.f),
-      mSimulationSpeed(5),
-      mParticleSpacing(15),
-      mParticleSystem(mParticleCount, {GAME_SIZE_X, GAME_SIZE_Y}, mParticleRadius, mParticleSpacing),
-      mRenderer({GAME_SIZE_X, GAME_SIZE_Y})
 {
     if (!ImGui::SFML::Init(mRenderer.getWindow()))
     {
@@ -28,7 +23,7 @@ void FluidSimulation::run()
 
     while (mRenderer.isWindowOpen())
     {
-        mDeltaTime = mDeltaClock.restart() * (float)mSimulationSpeed;
+        mDeltaTime = mDeltaClock.restart() * (float)SimulationConfig::getInstance().simulationSpeed();
         processEvents();
         update();
         timeSinceLastGuiUpdate += guiClock.restart();
@@ -52,6 +47,7 @@ void FluidSimulation::processEvents()
         }
         else if (const auto *resized = event->getIf<sf::Event::Resized>())
         {
+            SimulationConfig::getInstance().windowSize({resized->size.x, resized->size.y});
             mRenderer.resize(sf::Vector2u({resized->size.x, resized->size.y}));
         }
     }
@@ -59,90 +55,14 @@ void FluidSimulation::processEvents()
 
 void FluidSimulation::update()
 {
-    if (!mPaused)
+    if (!SimulationConfig::getInstance().paused())
     {
-        mParticleSystem.update(mDeltaTime, {GAME_SIZE_X, GAME_SIZE_Y});
+        mParticleSystem.update(mDeltaTime);
     }
 }
 
 void FluidSimulation::render()
 {
-    showUI();
+    mGUI.showUI(mRenderer.getWindow(), mDeltaTime);
     mRenderer.render(mParticleSystem);
-}
-
-void FluidSimulation::showUI()
-{
-    ImGui::SFML::Update(mRenderer.getWindow(), mDeltaTime);
-
-    ImGui::SetNextWindowSize({250, 0.0f}, ImGuiCond_Always);
-    ImGui::Begin("Simulation Controls");
-    ImGui::PushItemWidth(100);
-
-    // Pause/Resume button
-    if (ImGui::Button(mPaused ? "Resume" : "Pause"))
-    {
-        mPaused = !mPaused;
-    }
-
-    // Simulation speed
-    if (ImGui::InputInt("Simulation Speed", &mSimulationSpeed))
-    {
-        if (mSimulationSpeed < 1)
-        {
-            mSimulationSpeed = 1;
-        }
-        if (mSimulationSpeed > 10)
-        {
-            mSimulationSpeed = 10;
-        }
-    }
-
-    // Particle count
-    if (ImGui::InputInt("Particle Count", (int *)&mParticleCount))
-    {
-        mPaused = true;
-        if (mParticleCount < 1)
-        {
-            mParticleCount = 1;
-        }
-        if (mParticleCount > 100000)
-        {
-            mParticleCount = 100000;
-        }
-        mParticleSystem.setParticleCount(mParticleCount);
-    }
-
-    // Particle radius
-    if (ImGui::InputFloat("Particle Radius", &mParticleRadius))
-    {
-        if (mParticleRadius < 0.1f)
-        {
-            mParticleRadius = 0.1f;
-        }
-        if (mParticleRadius > 20.f)
-        {
-            mParticleRadius = 20.f;
-        }
-        mParticleSystem.setParticleRadius(mParticleRadius);
-    }
-
-    // Particle spacing
-    if (ImGui::InputInt("Particle Spacing", &mParticleSpacing))
-    {
-        mPaused = true;
-        if (mParticleSpacing < 1)
-        {
-            mParticleSpacing = 1;
-        }
-        if (mParticleSpacing > 100)
-        {
-            mParticleSpacing = 100;
-        }
-        mParticleSystem.setParticleSpacing(mParticleSpacing);
-    }
-
-    ImGui::PopItemWidth();
-    ImGui::End();
-    ImGui::SFML::Render(mRenderer.getWindow());
 }

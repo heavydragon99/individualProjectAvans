@@ -1,14 +1,16 @@
 #include "renderer.h"
 
+#include "simulationConfig.h"
+
 #include <iostream>
 
-Renderer::Renderer(const sf::Vector2u &gameSize)
-    : mGameSize(gameSize), mWindowSize(getScreenSize()), mWindow(sf::VideoMode(getScreenSize()), "Fluid Simulation")
+Renderer::Renderer()
+    : mWindow(sf::VideoMode(getScreenSize()), "Fluid Simulation")
 {
     mWindow.setFramerateLimit(60);
 
     // Create a render texture for off-screen drawing.
-    if (!mRenderTexture.resize(mGameSize))
+    if (!mRenderTexture.resize(SimulationConfig::getInstance().gameSize()))
     {
         std::cerr << "Failed to create render texture!" << std::endl;
     }
@@ -35,7 +37,7 @@ void Renderer::draw(sf::RenderTarget &target, const ParticleSystem &particleSyst
     }
 
     // Draw a red line of 1 game unit around the edge
-    sf::RectangleShape border(sf::Vector2f(mGameSize.x-2, mGameSize.y-2));
+    sf::RectangleShape border(sf::Vector2f(SimulationConfig::getInstance().gameSize().x - 2, SimulationConfig::getInstance().gameSize().y - 2));
     border.setPosition({1, 1});
     border.setFillColor(sf::Color::Transparent);
     border.setOutlineThickness(1);
@@ -54,8 +56,8 @@ void Renderer::render(ParticleSystem &particleSystem)
     sf::Sprite sprite(mRenderTexture.getTexture());
 
     // Calculate the scale factors while maintaining the aspect ratio.
-    float scaleX = static_cast<float>(mWindow.getSize().x) / mGameSize.x;
-    float scaleY = static_cast<float>(mWindow.getSize().y) / mGameSize.y;
+    float scaleX = static_cast<float>(mWindow.getSize().x) / SimulationConfig::getInstance().gameSize().x;
+    float scaleY = static_cast<float>(mWindow.getSize().y) / SimulationConfig::getInstance().gameSize().y;
     float scale = std::min(scaleX, scaleY); // Use the smaller scale factor to maintain aspect ratio.
     sprite.setScale({scale, scale});
 
@@ -71,17 +73,18 @@ bool Renderer::isWindowOpen() const
 
 void Renderer::resize(const sf::Vector2u &screenSize)
 {
+    sf::Vector2u gameSize = SimulationConfig::getInstance().gameSize();
     // Create a view with your game area's dimensions.
-    sf::View view(sf::FloatRect({0.f, 0.f}, {mGameSize.x, mGameSize.y}));
+    sf::View view(sf::FloatRect({0.f, 0.f}, {gameSize.x, gameSize.y}));
     // Adjust the view to maintain aspect ratio with black bars.
-    view = getLetterboxView(mGameSize, screenSize.x, screenSize.y);
+    view = getLetterboxView(gameSize, screenSize.x, screenSize.y);
     mWindow.setView(view);
 
     // Update shader uniform.
     // mFluidShader.setUniform("resolution", sf::Vector2f(mGameSize.x, mGameSize.y));
 
     // Update the window size.
-    mWindowSize = {screenSize.x, screenSize.y};
+    SimulationConfig::getInstance().windowSize({screenSize.x, screenSize.y});
 }
 
 void Renderer::close()

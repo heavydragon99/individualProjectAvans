@@ -1,17 +1,29 @@
 #include "particleSystem.h"
+
 #include "physics.h"
+#include "simulationConfig.h"
+
 #include <cmath>
 
-ParticleSystem::ParticleSystem(unsigned int aNumParticles, const sf::Vector2u &aWindowSize, float aParticleRadius, float aParticleSpacing) 
-    : mWindowSize(aWindowSize), mParticleSpacing(aParticleSpacing)
+ParticleSystem::ParticleSystem()
 {
     mPhysicsEngine = std::make_unique<Physics>(mParticles);
-    spawnParticles(aNumParticles, aWindowSize, aParticleRadius);
+
+    // Register callbacks
+    SimulationConfig &config = SimulationConfig::getInstance();
+    config.setOnParticleCountChanged([this]
+                                     { updatedParticleCount(); });
+    config.setOnParticleRadiusChanged([this]
+                                      { updatedParticleRadius(); });
+    config.setOnParticleSpacingChanged([this]
+                                       { updatedParticleSpacing(); });
+
+    spawnParticles();
 }
 
-void ParticleSystem::update(sf::Time aDeltaTime, const sf::Vector2u &aWindowSize)
+void ParticleSystem::update(sf::Time aDeltaTime)
 {
-    mPhysicsEngine->update(aDeltaTime, aWindowSize);
+    mPhysicsEngine->update(aDeltaTime);
 }
 
 const std::vector<Particle> &ParticleSystem::getParticles() const
@@ -19,43 +31,46 @@ const std::vector<Particle> &ParticleSystem::getParticles() const
     return mParticles;
 }
 
-void ParticleSystem::setParticleCount(unsigned int aNumParticles)
+void ParticleSystem::updatedParticleCount()
 {
-    float radius = mParticles.front().mRadius;
     mParticles.clear();
-    spawnParticles(aNumParticles, mWindowSize, radius);
+    spawnParticles();
 }
 
-void ParticleSystem::setParticleRadius(float aParticleRadius)
+void ParticleSystem::updatedParticleRadius()
 {
+    float radius = SimulationConfig::getInstance().particleRadius();
     for (auto &p : mParticles)
     {
-        p.mRadius = aParticleRadius;
+        p.mRadius = radius;
     }
 }
 
-void ParticleSystem::setParticleSpacing(float aParticleSpacing)
+void ParticleSystem::updatedParticleSpacing()
 {
-    mParticleSpacing = aParticleSpacing;
-    float radius = mParticles.front().mRadius;
-    unsigned int numParticles = mParticles.size();
     mParticles.clear();
-    spawnParticles(numParticles, mWindowSize, radius);
+    spawnParticles();
 }
 
-void ParticleSystem::spawnParticles(unsigned int aNumParticles, const sf::Vector2u &aWindowSize, float aParticleRadius){
+void ParticleSystem::spawnParticles()
+{
+    SimulationConfig &config = SimulationConfig::getInstance();
     // Create a grid of particles.
-    int particlesPerRow = static_cast<int>(std::sqrt(aNumParticles));
-    int particlesPerColumn = (aNumParticles - 1) / particlesPerRow + 1;
+    unsigned int numParticles = config.particleCount();
+    int particlesPerRow = static_cast<int>(std::sqrt(numParticles));
+    int particlesPerColumn = (numParticles - 1) / particlesPerRow + 1;
 
     // Calculate offsets to center the grid.
-    float offsetX = aWindowSize.x * 0.5f;
-    float offsetY = aWindowSize.y * 0.5f;
+    sf::Vector2u windowSize = config.windowSize();
+    float offsetX = windowSize.x * 0.5f;
+    float offsetY = windowSize.y * 0.5f;
 
-    for (unsigned int i = 0; i < aNumParticles; i++)
+    float particleRadius = config.particleRadius();
+    float particleSpacing = config.particleSpacing();
+    for (unsigned int i = 0; i < numParticles; i++)
     {
-        float x = (i % particlesPerRow - particlesPerRow * 0.5f + 0.5f) * mParticleSpacing + offsetX;
-        float y = (i / particlesPerRow - particlesPerColumn * 0.5f + 0.5f) * mParticleSpacing + offsetY;
-        mParticles.emplace_back(sf::Vector2f(x, y), sf::Vector2f(0.f, 0.f), aParticleRadius);
+        float x = (i % particlesPerRow - particlesPerRow * 0.5f + 0.5f) * particleSpacing + offsetX;
+        float y = (i / particlesPerRow - particlesPerColumn * 0.5f + 0.5f) * particleSpacing + offsetY;
+        mParticles.emplace_back(sf::Vector2f(x, y), sf::Vector2f(0.f, 0.f), particleRadius);
     }
 }

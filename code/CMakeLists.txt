@@ -27,6 +27,8 @@ set(SOURCES
     ${PROJECT_SOURCE_DIR}/src/particleSystem.cpp
     ${PROJECT_SOURCE_DIR}/src/physics.cpp
     ${PROJECT_SOURCE_DIR}/src/renderer.cpp
+    ${PROJECT_SOURCE_DIR}/src/simulationConfig.cpp
+    ${PROJECT_SOURCE_DIR}/src/simulationGUI.cpp
     ${PROJECT_SOURCE_DIR}/modules/imgui/imgui_draw.cpp
     ${PROJECT_SOURCE_DIR}/modules/imgui/imgui_tables.cpp
     ${PROJECT_SOURCE_DIR}/modules/imgui/imgui_widgets.cpp

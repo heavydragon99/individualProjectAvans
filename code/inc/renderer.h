@@ -7,7 +7,7 @@
 class Renderer
 {
 public:
-    Renderer(const sf::Vector2u &gameSize);
+    Renderer();
 
     void draw(sf::RenderTarget &target, const ParticleSystem &particleSystem);
     void render(ParticleSystem &particleSystem);
@@ -17,8 +17,6 @@ public:
     sf::RenderWindow &getWindow() { return mWindow; }
 
 private:
-    sf::Vector2u mGameSize;
-    sf::Vector2u mWindowSize;
     sf::RenderWindow mWindow;
     sf::RenderTexture mRenderTexture;
     // sf::Shader mFluidShader;
