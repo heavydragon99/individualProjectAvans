@@ -45,10 +45,16 @@ void Renderer::draw(sf::RenderTarget &target, const ParticleSystem &particleSyst
     target.draw(border);
 }
 
+void Renderer::clear()
+{
+    mWindow.clear(sf::Color::Black);
+}
+
 void Renderer::render(ParticleSystem &particleSystem)
 {
-    // Draw the particles into the off-screen render texture.
     mRenderTexture.clear(sf::Color::Transparent);
+    
+    // Draw the particles into the off-screen render texture.
     draw(mRenderTexture, particleSystem);
     mRenderTexture.display();
 
@@ -62,8 +68,11 @@ void Renderer::render(ParticleSystem &particleSystem)
     sprite.setScale({scale, scale});
 
     mWindow.draw(sprite);
+}
+
+void Renderer::display()
+{
     mWindow.display();
-    mWindow.clear(sf::Color::Black);
 }
 
 bool Renderer::isWindowOpen() const
@@ -75,7 +84,7 @@ void Renderer::resize(const sf::Vector2u &screenSize)
 {
     sf::Vector2u gameSize = SimulationConfig::getInstance().gameSize();
     // Create a view with your game area's dimensions.
-    sf::View view(sf::FloatRect({0.f, 0.f}, {gameSize.x, gameSize.y}));
+    sf::View view(sf::FloatRect({0.f, 0.f}, {(float)gameSize.x, (float)gameSize.y}));
     // Adjust the view to maintain aspect ratio with black bars.
     view = getLetterboxView(gameSize, screenSize.x, screenSize.y);
     mWindow.setView(view);
@@ -99,7 +108,7 @@ sf::Vector2u Renderer::getScreenSize() const
 
 sf::View Renderer::getLetterboxView(const sf::Vector2u &gameSize, int windowWidth, int windowHeight)
 {
-    sf::View view(sf::FloatRect({0.f, 0.f}, {gameSize.x, gameSize.y}));
+    sf::View view(sf::FloatRect({0.f, 0.f}, {(float)gameSize.x, (float)gameSize.y}));
 
     float windowAspect = static_cast<float>(windowWidth) / windowHeight;
     float gameAspect = static_cast<float>(gameSize.x) / gameSize.y;
@@ -108,7 +117,7 @@ sf::View Renderer::getLetterboxView(const sf::Vector2u &gameSize, int windowWidt
     {
         // If window is narrower than game aspect ratio -> scale height to match window height
         float newWidth = gameSize.y * windowAspect;
-        view.setSize({newWidth, gameSize.y});
+        view.setSize({newWidth, (float)gameSize.y});
     }
 
     // Center horizontally in the viewport

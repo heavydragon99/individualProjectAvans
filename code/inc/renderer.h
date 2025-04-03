@@ -10,7 +10,9 @@ public:
     Renderer();
 
     void draw(sf::RenderTarget &target, const ParticleSystem &particleSystem);
+    void clear();
     void render(ParticleSystem &particleSystem);
+    void display();
     bool isWindowOpen() const;
     void resize(const sf::Vector2u &screenSize);
     void close();

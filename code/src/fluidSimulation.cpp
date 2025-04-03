@@ -63,6 +63,8 @@ void FluidSimulation::update()
 
 void FluidSimulation::render()
 {
-    mGUI.showUI(mRenderer.getWindow(), mDeltaTime);
+    mRenderer.clear();
     mRenderer.render(mParticleSystem);
+    mGUI.showUI(mRenderer.getWindow(), mDeltaTime);
+    mRenderer.display();
 }
