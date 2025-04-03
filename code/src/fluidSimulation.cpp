@@ -55,7 +55,7 @@ void FluidSimulation::processEvents()
 
 void FluidSimulation::update()
 {
-    if (!SimulationConfig::getInstance().paused())
+    if (SimulationConfig::getInstance().simulationState() == SimulationState::RUNNING)
     {
         mParticleSystem.update(mDeltaTime);
     }

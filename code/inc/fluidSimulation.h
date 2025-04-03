@@ -9,7 +9,6 @@
 #include <imgui.h>
 #include <imgui-SFML.h>
 #include "simulationGUI.h"
-
 class FluidSimulation
 {
 public:
@@ -28,6 +27,7 @@ private:
     ParticleSystem mParticleSystem;
     Renderer mRenderer;
     SimulationGUI mGUI;
+    SimulationState mState;
 };
 
 #endif // FLUID_SIMULATION_H

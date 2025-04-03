@@ -20,8 +20,12 @@ void SimulationGUI::renderControls()
     auto &config = SimulationConfig::getInstance();
 
     // Pause/Resume button
-    if (ImGui::Button(config.paused() ? "Resume" : "Pause")) {
-        config.paused(!config.paused());
+    if (ImGui::Button(config.simulationState() == SimulationState::SETUP ? "Start" : "Stop")) {
+        if (config.simulationState() == SimulationState::SETUP) {
+            config.simulationState(SimulationState::RUNNING);
+        } else {
+            config.simulationState(SimulationState::SETUP);
+        }
     }
 
     // Simulation speed

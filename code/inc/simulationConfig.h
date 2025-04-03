@@ -4,14 +4,21 @@
 #include <functional>
 #include <SFML/System/Vector2.hpp>
 
+enum class SimulationState
+{
+    SETUP,
+    RUNNING,
+    PAUSED
+};
+
 class SimulationConfig
 {
 public:
     static SimulationConfig &getInstance();
 
     // Getters and setters for simulation parameters
-    bool paused() const;
-    void paused(bool paused);
+    SimulationState simulationState() const;
+    void simulationState(SimulationState aState);
 
     unsigned int particleCount() const;
     void particleCount(unsigned int aCount);
@@ -51,7 +58,7 @@ private:
     SimulationConfig &operator=(const SimulationConfig &) = delete;
 
     // Simulation parameters
-    bool mPaused;
+    SimulationState mSimulationState;
     unsigned int mParticleCount;
     float mParticleRadius;
     int mSimulationSpeed;
