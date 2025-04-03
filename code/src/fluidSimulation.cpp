@@ -23,7 +23,7 @@ void FluidSimulation::run()
 
     while (mRenderer.isWindowOpen())
     {
-        mDeltaTime = mDeltaClock.restart() * 3.0f;
+        mDeltaTime = mDeltaClock.restart() * 2.f;
         processEvents();
         update();
         timeSinceLastGuiUpdate += guiClock.restart();
@@ -52,11 +52,11 @@ void FluidSimulation::processEvents()
         }
         if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
         {
-            mParticleSystem.applyMouseForce(mRenderer.getWindow().mapPixelToCoords({sf::Mouse::getPosition(mRenderer.getWindow()).x, sf::Mouse::getPosition(mRenderer.getWindow()).y}), -20.f);
+            mParticleSystem.applyMouseForce(mRenderer.getWindow().mapPixelToCoords({sf::Mouse::getPosition(mRenderer.getWindow()).x, sf::Mouse::getPosition(mRenderer.getWindow()).y}), -5.f);
         }
         else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
         {
-            mParticleSystem.applyMouseForce(mRenderer.getWindow().mapPixelToCoords({sf::Mouse::getPosition(mRenderer.getWindow()).x, sf::Mouse::getPosition(mRenderer.getWindow()).y}), 20.f);
+            mParticleSystem.applyMouseForce(mRenderer.getWindow().mapPixelToCoords({sf::Mouse::getPosition(mRenderer.getWindow()).x, sf::Mouse::getPosition(mRenderer.getWindow()).y}), 5.f);
         }
 
     }

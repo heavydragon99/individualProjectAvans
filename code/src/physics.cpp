@@ -149,7 +149,7 @@ float Physics::smoothingKernelDerivative(float aRadius, float aDistance)
 float Physics::calculateDensity(int aParticleIndex)
 {
     float density = 0.0f;
-    const float mass = 10.0f;
+    const float mass = 1.0f;
     float smoothingRadius = SimulationConfig::getInstance().smoothingRadius();
 
     Particle &sampleParticle = mParticles[aParticleIndex];
@@ -169,7 +169,7 @@ float Physics::calculateDensity(int aParticleIndex)
 
 sf::Vector2f Physics::calculatePressureForce(int aParticleIndex)
 {
-    const float mass = 10.0f;
+    const float mass = 1.0f;
     sf::Vector2f pressureForce{0.0f, 0.0f};
     float smoothingRadius = SimulationConfig::getInstance().smoothingRadius();
 

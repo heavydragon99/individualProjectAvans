@@ -116,7 +116,7 @@ sf::View Renderer::getLetterboxView(const sf::Vector2u &gameSize, int windowWidt
 
 void Renderer::drawParticles(const ParticleSystem &particleSystem)
 {
-    sf::Vector2f maxVelocity = {150.0f, 150.0f};
+    sf::Vector2f maxVelocity = {100.0f, 100.0f};
     sf::Vector2f minVelocity = {0.0f, 0.0f};
 
     float maxSpeedMagnitude = std::sqrt(maxVelocity.x * maxVelocity.x + maxVelocity.y * maxVelocity.y);

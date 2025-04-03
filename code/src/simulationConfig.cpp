@@ -7,7 +7,7 @@ SimulationConfig &SimulationConfig::getInstance()
 }
 
 SimulationConfig::SimulationConfig()
-    : mSimulationState(SimulationState::SETUP), mParticleCount(1000), mParticleRadius(5.f), mParticleSpacing(15), mGameSize({1920, 1080}), mWindowSize({1920, 1080}), mSmoothingRadius(50), mTargetDensity(10), mPressureMultiplier(100) {}
+    : mSimulationState(SimulationState::SETUP), mParticleCount(1500), mParticleRadius(6.f), mParticleSpacing(20), mGameSize({1920, 1080}), mWindowSize({1920, 1080}), mSmoothingRadius(75), mTargetDensity(5), mPressureMultiplier(5) {}
 
 SimulationState SimulationConfig::simulationState() const { return mSimulationState; }
 void SimulationConfig::simulationState(SimulationState aState) { mSimulationState = aState; }
