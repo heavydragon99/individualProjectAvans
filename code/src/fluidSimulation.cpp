@@ -59,6 +59,11 @@ void FluidSimulation::update()
     {
         mParticleSystem.update(mDeltaTime);
     }
+    else if (SimulationConfig::getInstance().simulationState() == SimulationState::RESET)
+    {
+        mParticleSystem.reset();
+        SimulationConfig::getInstance().simulationState(SimulationState::SETUP);
+    }
 }
 
 void FluidSimulation::render()

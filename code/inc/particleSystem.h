@@ -14,6 +14,7 @@ public:
     ParticleSystem();
 
     void update(sf::Time aDeltaTime);
+    void reset();
     const std::vector<Particle>& getParticles() const;
     void updatedParticleCount();
     void updatedParticleRadius();

@@ -12,7 +12,8 @@ public:
     void showUI(sf::RenderWindow& window, sf::Time deltaTime);
 
 private:
-    void renderControls();
+    void renderControlsSetup();
+    void renderControlsRunning();
 };
 
 #endif // SIMULATION_GUI_H

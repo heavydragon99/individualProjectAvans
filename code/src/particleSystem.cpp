@@ -26,6 +26,12 @@ void ParticleSystem::update(sf::Time aDeltaTime)
     mPhysicsEngine->update(aDeltaTime);
 }
 
+void ParticleSystem::reset()
+{
+    mParticles.clear();
+    spawnParticles();
+}
+
 const std::vector<Particle> &ParticleSystem::getParticles() const
 {
     return mParticles;

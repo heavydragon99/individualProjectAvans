@@ -8,14 +8,19 @@ void SimulationGUI::showUI(sf::RenderWindow &window, sf::Time deltaTime)
     ImGui::Begin("Simulation Controls");
     ImGui::PushItemWidth(100);
 
-    renderControls();
+    auto &config = SimulationConfig::getInstance();
+    if (config.simulationState() == SimulationState::SETUP) {
+        renderControlsSetup();
+    } else if (config.simulationState() == SimulationState::RUNNING || config.simulationState() == SimulationState::PAUSED) {
+        renderControlsRunning();
+    }
 
     ImGui::PopItemWidth();
     ImGui::End();
     ImGui::SFML::Render(window);
 }
 
-void SimulationGUI::renderControls()
+void SimulationGUI::renderControlsSetup()
 {
     auto &config = SimulationConfig::getInstance();
 
@@ -107,6 +112,70 @@ void SimulationGUI::renderControls()
             pressureMultiplier = 0.5f;
         }
         if (pressureMultiplier > 10000.f) {
+            pressureMultiplier = 10000.f;
+        }
+        config.pressureMultiplier(pressureMultiplier);
+    }
+}
+
+void SimulationGUI::renderControlsRunning()
+{
+    auto &config = SimulationConfig::getInstance();
+
+    // Pause/Resume button
+    if (ImGui::Button(config.simulationState() == SimulationState::RUNNING ? "Pause" : "Resume")) {
+        if (config.simulationState() == SimulationState::RUNNING) {
+            config.simulationState(SimulationState::PAUSED);
+        } else {
+            config.simulationState(SimulationState::RUNNING);
+        }
+    }
+
+    // Reset button
+    if (ImGui::Button("Reset")) {
+        config.simulationState(SimulationState::RESET);
+    }
+
+    // Smoothing radius
+    float smoothingRadius = config.smoothingRadius();
+    if (ImGui::InputFloat("Smoothing Radius", &smoothingRadius))
+    {
+        if (smoothingRadius < 1.f)
+        {
+            smoothingRadius = 1.f;
+        }
+        if (smoothingRadius > 10000.f)
+        {
+            smoothingRadius = 10000.f;
+        }
+        config.smoothingRadius(smoothingRadius);
+    }
+
+    // Target density
+    float targetDensity = config.targetDensity();
+    if (ImGui::InputFloat("Target Density", &targetDensity))
+    {
+        if (targetDensity < 0.01f)
+        {
+            targetDensity = 1.f;
+        }
+        if (targetDensity > 100.f)
+        {
+            targetDensity = 100.f;
+        }
+        config.targetDensity(targetDensity);
+    }
+
+    // Pressure multiplier
+    float pressureMultiplier = config.pressureMultiplier();
+    if (ImGui::InputFloat("Pressure Multiplier", &pressureMultiplier))
+    {
+        if (pressureMultiplier < 0.5f)
+        {
+            pressureMultiplier = 0.5f;
+        }
+        if (pressureMultiplier > 10000.f)
+        {
             pressureMultiplier = 10000.f;
         }
         config.pressureMultiplier(pressureMultiplier);

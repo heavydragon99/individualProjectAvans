@@ -8,7 +8,8 @@ enum class SimulationState
 {
     SETUP,
     RUNNING,
-    PAUSED
+    PAUSED,
+    RESET
 };
 
 class SimulationConfig
