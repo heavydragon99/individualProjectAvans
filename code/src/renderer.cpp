@@ -53,7 +53,7 @@ void Renderer::clear()
 void Renderer::render(ParticleSystem &particleSystem)
 {
     mRenderTexture.clear(sf::Color::Transparent);
-    
+
     // Draw the particles into the off-screen render texture.
     draw(mRenderTexture, particleSystem);
     mRenderTexture.display();
@@ -83,10 +83,7 @@ bool Renderer::isWindowOpen() const
 void Renderer::resize(const sf::Vector2u &screenSize)
 {
     sf::Vector2u gameSize = SimulationConfig::getInstance().gameSize();
-    // Create a view with your game area's dimensions.
-    sf::View view(sf::FloatRect({0.f, 0.f}, {(float)gameSize.x, (float)gameSize.y}));
-    // Adjust the view to maintain aspect ratio with black bars.
-    view = getLetterboxView(gameSize, screenSize.x, screenSize.y);
+    sf::View view = getLetterboxView(gameSize, screenSize.x, screenSize.y);
     mWindow.setView(view);
 
     // Update shader uniform.
@@ -108,6 +105,7 @@ sf::Vector2u Renderer::getScreenSize() const
 
 sf::View Renderer::getLetterboxView(const sf::Vector2u &gameSize, int windowWidth, int windowHeight)
 {
+    // Create the default view with game dimensions.
     sf::View view(sf::FloatRect({0.f, 0.f}, {(float)gameSize.x, (float)gameSize.y}));
 
     float windowAspect = static_cast<float>(windowWidth) / windowHeight;
@@ -115,15 +113,57 @@ sf::View Renderer::getLetterboxView(const sf::Vector2u &gameSize, int windowWidt
 
     if (windowAspect < gameAspect)
     {
-        // If window is narrower than game aspect ratio -> scale height to match window height
+        // Window is narrower than game; adjust width.
         float newWidth = gameSize.y * windowAspect;
-        view.setSize({newWidth, (float)gameSize.y});
+        view.setSize({newWidth, static_cast<float>(gameSize.y)});
+        // Center horizontally in the viewport.
+        float viewportX = (gameSize.x - newWidth) / (2 * gameSize.x);
+        view.setViewport(sf::FloatRect({viewportX, 0.f}, {newWidth / gameSize.x, 1.f}));
     }
-
-    // Center horizontally in the viewport
-    float sizeX = windowAspect / gameAspect;
-    float posX = (1.f - sizeX) / 2.f;
-    view.setViewport(sf::FloatRect({posX, 0.f}, {sizeX, 1.f}));
+    else
+    {
+        // Window is wider than game; adjust height.
+        float newHeight = gameSize.x / windowAspect;
+        view.setSize({static_cast<float>(gameSize.x), newHeight});
+        // Center vertically in the viewport.
+        float viewportY = (gameSize.y - newHeight) / (2 * gameSize.y);
+        view.setViewport(sf::FloatRect({0.f, viewportY}, {1.f, newHeight / gameSize.y}));
+    }
 
     return view;
 }
+
+// sf::View Renderer::getLetterboxView(const sf::Vector2u &gameSize, int windowWidth, int windowHeight)
+// {
+//     sf::View view(sf::FloatRect({0.f, 0.f}, {(float)gameSize.x, (float)gameSize.y}));
+
+//     // Compute the window's aspect ratio
+//     float windowRatio = static_cast<float>(windowWidth) / windowHeight;
+//     // Compute the desired view's aspect ratio
+//     float viewRatio = gameSize.x / gameSize.y;
+
+//     // Initialize the viewport dimensions (as fractions of the window)
+//     float sizeX = 1.0f;
+//     float sizeY = 1.0f;
+//     float posX = 0.0f;
+//     float posY = 0.0f;
+
+//     // Determine whether horizontal or vertical letterboxing is needed
+//     if (windowRatio < viewRatio)
+//     {
+//         // The window is too narrow: add black bars on the left and right.
+//         sizeX = viewRatio / windowRatio;
+//         posX = (1.0f - sizeX) / 2.0f;
+//     }
+//     else
+//     {
+//         // The window is too wide: add black bars on the top and bottom.
+//         sizeY = windowRatio / viewRatio;
+//         posY = (1.0f - sizeY) / 2.0f;
+//     }
+
+//     // Set the viewport of the view (values between 0 and 1)
+//     view.setViewport(sf::FloatRect({posX, posY}, {sizeX, sizeY}));
+
+//     return view;
+// }
