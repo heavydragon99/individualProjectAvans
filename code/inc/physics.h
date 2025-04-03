@@ -23,6 +23,7 @@ public:
 
     void initialize();
     void update(sf::Time aDeltaTime);
+    void applyMouseForce(const sf::Vector2f& aMousePosition, float aForceMagnitude);
 
 private:
     void applyGravity(sf::Time aDeltaTime);

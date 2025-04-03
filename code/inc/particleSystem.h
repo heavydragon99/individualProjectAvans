@@ -20,6 +20,7 @@ public:
     void updatedParticleCount();
     void updatedParticleRadius();
     void updatedParticleSpacing();
+    void applyMouseForce(const sf::Vector2f& aMousePosition, float aForceMagnitude);
 
 private:
     void spawnParticles();

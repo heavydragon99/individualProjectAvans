@@ -50,6 +50,15 @@ void FluidSimulation::processEvents()
             SimulationConfig::getInstance().windowSize({resized->size.x, resized->size.y});
             mRenderer.resize(sf::Vector2u({resized->size.x, resized->size.y}));
         }
+        if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+        {
+            mParticleSystem.applyMouseForce(mRenderer.getWindow().mapPixelToCoords({sf::Mouse::getPosition(mRenderer.getWindow()).x, sf::Mouse::getPosition(mRenderer.getWindow()).y}), -20.f);
+        }
+        else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
+        {
+            mParticleSystem.applyMouseForce(mRenderer.getWindow().mapPixelToCoords({sf::Mouse::getPosition(mRenderer.getWindow()).x, sf::Mouse::getPosition(mRenderer.getWindow()).y}), 20.f);
+        }
+
     }
 }
 

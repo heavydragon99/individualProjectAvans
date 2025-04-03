@@ -33,12 +33,33 @@ void Physics::update(sf::Time aDeltaTime)
     checkBoundary();
 }
 
+void Physics::applyMouseForce(const sf::Vector2f &aMousePosition, float aForceMagnitude)
+{
+    for (auto &particle : mParticles)
+    {
+        sf::Vector2f interactionForce = {0.f, 0.f};
+        sf::Vector2f offset = aMousePosition - particle.mPosition;
+        float sqrDistance = std::hypot(offset.x, offset.y);
+
+        //If particle is within the interaction radius
+        if (sqrDistance < 150.f)
+        {
+            float distance = std::sqrt(sqrDistance);
+            sf::Vector2f dirToMouse = distance <= 0.0f ? sf::Vector2f{0.0f, 0.0f} : offset / distance;
+            float centreT = 1 - (distance / 150.f);
+            interactionForce += (dirToMouse * aForceMagnitude - particle.mVelocity) * centreT;
+        }
+        // Apply the force to the particle
+        particle.mVelocity += interactionForce;
+    }
+}
+
 void Physics::applyGravity(sf::Time aDeltaTime)
 {
     for (size_t i = 0; i < mParticles.size(); ++i)
     {
         Particle &particle = mParticles[i];
-        particle.mVelocity.y += GRAVITY * aDeltaTime.asSeconds();          // Apply gravity.
+        // particle.mVelocity.y += GRAVITY * aDeltaTime.asSeconds();          // Apply gravity.
         mPredictedPositions[i] = particle.mPosition + particle.mVelocity * (1.0f / 120.0f); // Predict new position.
     }
 }
