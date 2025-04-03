@@ -1,4 +1,10 @@
 {
+      "search.exclude": {
+        "**/code/modules/**": true
+    },
+    "files.exclude": {
+      "**/code/modules/**": true
+    },
     "files.associations": {
       "optional": "cpp",
       "format": "cpp",

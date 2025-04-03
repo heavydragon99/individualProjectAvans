@@ -3,18 +3,21 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**",
-                "${workspaceFolder}/code/inc",
-                "/usr/include/qt6/QtWidgets",
-                "/usr/include/qt6/QtCore",
-                "/usr/include/qt6",
-                "/usr/include/qt6/QtGui"
+                "${workspaceFolder}/code/modules/**",
+                "${workspaceFolder}/code/inc/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",
             "cStandard": "c17",
-            "cppStandard": "c++17",
-            "intelliSenseMode": "linux-clang-x64"
+            "cppStandard": "c++23",
+            "intelliSenseMode": "linux-clang-x64",
+            "browse": {
+                "path": [
+                    "${workspaceFolder}/code/inc/**"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            }
         }
     ],
     "version": 4
