@@ -23,6 +23,7 @@ include_directories(
 # Add source directory
 set(SOURCES
     ${PROJECT_SOURCE_DIR}/src/fluidSimulation.cpp
+    ${PROJECT_SOURCE_DIR}/src/linearQuadTree.cpp
     ${PROJECT_SOURCE_DIR}/src/main.cpp
     ${PROJECT_SOURCE_DIR}/src/particleSystem.cpp
     ${PROJECT_SOURCE_DIR}/src/physics.cpp

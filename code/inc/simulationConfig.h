@@ -7,6 +7,7 @@
 enum class SimulationState
 {
     SETUP,
+    INITIALIZING,
     RUNNING,
     PAUSED,
     RESET

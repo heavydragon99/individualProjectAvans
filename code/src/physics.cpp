@@ -14,10 +14,17 @@ extern "C"
     }
 }
 
-Physics::Physics(std::vector<Particle> &aParticles) : mParticles(aParticles) {}
+Physics::Physics(std::vector<Particle> &aParticles) : mParticles(aParticles), mQuadTree(aParticles) {}
+
+void Physics::initialize()
+{
+    mQuadTree.initialize();
+    mDensities.resize(mParticles.size());
+}
 
 void Physics::update(sf::Time aDeltaTime)
 {
+    mQuadTree.update();
     applyGravity(aDeltaTime);
     updateDensities();
     checkBoundary();
@@ -75,6 +82,11 @@ void Physics::updateForces(sf::Time aDeltaTime)
 {
     for (size_t particleIndex = 0; particleIndex < mParticles.size(); ++particleIndex)
     {
+        float density = mDensities[particleIndex];
+        if (density <= 0.0f)
+        {
+            continue; // Skip if density is zero or negative.
+        }
         sf::Vector2f pressureForce = calculatePressureForce(particleIndex);
         sf::Vector2f pressureAcceleration = pressureForce / mDensities[particleIndex];
         mParticles[particleIndex].mVelocity += pressureAcceleration * aDeltaTime.asSeconds();
@@ -88,7 +100,7 @@ float Physics::smoothingKernel(float aRadius, float aDistance)
         return 0.0f;
     }
 
-    float volume =(M_PI * std::pow(aRadius, 4)) / 6;
+    float volume = (M_PI * std::pow(aRadius, 4)) / 6;
     return (aRadius - aDistance) * (aRadius - aDistance) / volume;
 }
 
@@ -106,15 +118,20 @@ float Physics::calculateDensity(int aParticleIndex)
 {
     float density = 0.0f;
     const float mass = 10.0f;
-
     float smoothingRadius = SimulationConfig::getInstance().smoothingRadius();
+
     Particle &sampleParticle = mParticles[aParticleIndex];
-    for (const auto &otherParticle : mParticles)
+    std::vector<size_t> neighbors = mQuadTree.findNeighbors(sampleParticle, smoothingRadius);
+
+    for (size_t neighborIndex : neighbors)
     {
-        float distance = std::hypot(otherParticle.mPosition.x - sampleParticle.mPosition.x, otherParticle.mPosition.y - sampleParticle.mPosition.y);
+        float distance = std::hypot(
+            mParticles[neighborIndex].mPosition.x - sampleParticle.mPosition.x,
+            mParticles[neighborIndex].mPosition.y - sampleParticle.mPosition.y);
         float influence = smoothingKernel(smoothingRadius, distance);
         density += mass * influence;
     }
+
     return density;
 }
 
@@ -122,40 +139,29 @@ sf::Vector2f Physics::calculatePressureForce(int aParticleIndex)
 {
     const float mass = 10.0f;
     sf::Vector2f pressureForce{0.0f, 0.0f};
-    int radius = SimulationConfig::getInstance().smoothingRadius();
-    for (size_t otherParticleIndex = 0; otherParticleIndex < mParticles.size(); ++otherParticleIndex)
+    float smoothingRadius = SimulationConfig::getInstance().smoothingRadius();
+
+    std::vector<size_t> neighbors = mQuadTree.findNeighbors(mParticles[aParticleIndex], smoothingRadius);
+
+    for (size_t neighborIndex : neighbors)
     {
-        if (otherParticleIndex == aParticleIndex)
+        if (neighborIndex == aParticleIndex)
         {
             continue;
         }
-        sf::Vector2f offset = mParticles[otherParticleIndex].mPosition - mParticles[aParticleIndex].mPosition;
+
+        sf::Vector2f offset = mParticles[neighborIndex].mPosition - mParticles[aParticleIndex].mPosition;
         float distance = std::hypot(offset.x, offset.y);
-        sf::Vector2f direction{0.0f, 0.0f};
-        if (distance == 0.0f)
-        {
-            while (direction == sf::Vector2f{0.0f, 0.0f})
-            {
-                // Generate a random direction
-                std::random_device rd;
-                std::mt19937 gen(rd());
-                std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
+        sf::Vector2f direction = (distance == 0.0f) ? sf::Vector2f{0.0f, 0.0f} : offset / distance;
 
-                float randomX = dist(gen);
-                float randomY = dist(gen);
-
-                // Normalize the random vector
-                float magnitude = std::sqrt(randomX * randomX + randomY * randomY);
-                direction = magnitude == 0.0f ? sf::Vector2f{0.0f, 0.0f} : sf::Vector2f{randomX / magnitude, randomY / magnitude};
-            }
-        }
-        else
+        float slope = smoothingKernelDerivative(smoothingRadius, distance);
+        float density = mDensities[neighborIndex];
+        if (density <= 0.0f)
         {
-            direction = offset / distance;
+            continue; // Skip if density is zero or negative.
         }
-        float slope = smoothingKernelDerivative(radius, distance);
-        float density = mDensities[otherParticleIndex];
         float sharedPressure = calculateSharedPressure(mDensities[aParticleIndex], density);
+
         pressureForce += -sharedPressure * direction * slope * mass / density;
     }
 

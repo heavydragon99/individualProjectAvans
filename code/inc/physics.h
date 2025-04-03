@@ -1,10 +1,12 @@
 #ifndef PHYSICS_H
 #define PHYSICS_H
 
-#include <vector>
 #include "particle.h"
+#include "linearQuadTree.h"
+
 #include <SFML/System/Vector2.hpp>
 #include <SFML/System/Clock.hpp>
+#include <vector>
 
 #define GRAVITY 9.8f
 #define COLLISION_DAMPING 0.8f
@@ -19,6 +21,7 @@ class Physics
 public:
     Physics(std::vector<Particle>& aParticles);
 
+    void initialize();
     void update(sf::Time aDeltaTime);
 
 private:
@@ -35,6 +38,7 @@ private:
     float calculateSharedPressure(float aDensityA, float aDensityB);
 
 private:
+    LinearQuadTree mQuadTree;
     std::vector<Particle> &mParticles;
     std::vector<float> mDensities;
 };

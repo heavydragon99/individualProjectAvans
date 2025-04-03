@@ -64,6 +64,11 @@ void FluidSimulation::update()
         mParticleSystem.reset();
         SimulationConfig::getInstance().simulationState(SimulationState::SETUP);
     }
+    else if (SimulationConfig::getInstance().simulationState() == SimulationState::INITIALIZING)
+    {
+        mParticleSystem.initialize();
+        SimulationConfig::getInstance().simulationState(SimulationState::RUNNING);
+    }
 }
 
 void FluidSimulation::render()

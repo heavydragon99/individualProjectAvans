@@ -17,8 +17,13 @@ ParticleSystem::ParticleSystem()
                                       { updatedParticleRadius(); });
     config.setOnParticleSpacingChanged([this]
                                        { updatedParticleSpacing(); });
-
     spawnParticles();
+                                    }
+
+void ParticleSystem::initialize()
+{
+    reset();
+    mPhysicsEngine->initialize();
 }
 
 void ParticleSystem::update(sf::Time aDeltaTime)

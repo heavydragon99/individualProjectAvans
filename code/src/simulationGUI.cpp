@@ -25,12 +25,8 @@ void SimulationGUI::renderControlsSetup()
     auto &config = SimulationConfig::getInstance();
 
     // Pause/Resume button
-    if (ImGui::Button(config.simulationState() == SimulationState::SETUP ? "Start" : "Stop")) {
-        if (config.simulationState() == SimulationState::SETUP) {
-            config.simulationState(SimulationState::RUNNING);
-        } else {
-            config.simulationState(SimulationState::SETUP);
-        }
+    if (ImGui::Button("Start")) {
+        config.simulationState(SimulationState::INITIALIZING);
     }
 
     // Simulation speed
@@ -51,8 +47,8 @@ void SimulationGUI::renderControlsSetup()
         if (count < 1) {
             count = 1;
         }
-        if (count > 100000) {
-            count = 100000;
+        if (count > 1000000) {
+            count = 1000000;
         }
         config.particleCount(count);
     }
@@ -108,8 +104,8 @@ void SimulationGUI::renderControlsSetup()
     // Pressure multiplier
     float pressureMultiplier = config.pressureMultiplier();
     if (ImGui::InputFloat("Pressure Multiplier", &pressureMultiplier)) {
-        if (pressureMultiplier < 0.5f) {
-            pressureMultiplier = 0.5f;
+        if (pressureMultiplier < 0.05f) {
+            pressureMultiplier = 0.05f;
         }
         if (pressureMultiplier > 10000.f) {
             pressureMultiplier = 10000.f;

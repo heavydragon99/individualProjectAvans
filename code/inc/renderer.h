@@ -19,6 +19,11 @@ public:
     sf::RenderWindow &getWindow() { return mWindow; }
 
 private:
+    void drawParticles(const ParticleSystem &particleSystem);
+    void drawGrid();
+    void drawBorder();
+
+private:
     sf::RenderWindow mWindow;
     sf::RenderTexture mRenderTexture;
     // sf::Shader mFluidShader;

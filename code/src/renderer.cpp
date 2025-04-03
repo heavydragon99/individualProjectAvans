@@ -24,27 +24,6 @@ Renderer::Renderer()
     // mFluidShader.setUniform("resolution", sf::Vector2f(gameSize.x, gameSize.y));
 }
 
-void Renderer::draw(sf::RenderTarget &target, const ParticleSystem &particleSystem)
-{
-    sf::CircleShape particle;
-    particle.setFillColor(sf::Color::White);
-    particle.setRadius(particleSystem.getParticles().front().mRadius);
-    particle.setOrigin({particleSystem.getParticles().front().mRadius, particleSystem.getParticles().front().mRadius});
-    for (const auto &p : particleSystem.getParticles())
-    {
-        particle.setPosition(p.mPosition);
-        target.draw(particle);
-    }
-
-    // Draw a red line of 1 game unit around the edge
-    sf::RectangleShape border(sf::Vector2f(SimulationConfig::getInstance().gameSize().x - 2, SimulationConfig::getInstance().gameSize().y - 2));
-    border.setPosition({1, 1});
-    border.setFillColor(sf::Color::Transparent);
-    border.setOutlineThickness(1);
-    border.setOutlineColor(sf::Color::Red);
-    target.draw(border);
-}
-
 void Renderer::clear()
 {
     mWindow.clear(sf::Color::Black);
@@ -55,7 +34,9 @@ void Renderer::render(ParticleSystem &particleSystem)
     mRenderTexture.clear(sf::Color::Transparent);
 
     // Draw the particles into the off-screen render texture.
-    draw(mRenderTexture, particleSystem);
+    drawGrid();
+    drawBorder();
+    drawParticles(particleSystem);
     mRenderTexture.display();
 
     // Draw the render texture with the fluid shader applied.
@@ -133,37 +114,50 @@ sf::View Renderer::getLetterboxView(const sf::Vector2u &gameSize, int windowWidt
     return view;
 }
 
-// sf::View Renderer::getLetterboxView(const sf::Vector2u &gameSize, int windowWidth, int windowHeight)
-// {
-//     sf::View view(sf::FloatRect({0.f, 0.f}, {(float)gameSize.x, (float)gameSize.y}));
+void Renderer::drawParticles(const ParticleSystem &particleSystem)
+{
+    sf::CircleShape particle;
+    particle.setFillColor(sf::Color::White);
+    particle.setRadius(particleSystem.getParticles().front().mRadius);
+    particle.setOrigin({particleSystem.getParticles().front().mRadius, particleSystem.getParticles().front().mRadius});
+    for (const auto &p : particleSystem.getParticles())
+    {
+        particle.setPosition(p.mPosition);
+        mRenderTexture.draw(particle);
+    }
+}
 
-//     // Compute the window's aspect ratio
-//     float windowRatio = static_cast<float>(windowWidth) / windowHeight;
-//     // Compute the desired view's aspect ratio
-//     float viewRatio = gameSize.x / gameSize.y;
+void Renderer::drawGrid()
+{
+    sf::Vector2u gameSize = SimulationConfig::getInstance().gameSize();
+    float gridSize = SimulationConfig::getInstance().smoothingRadius();
 
-//     // Initialize the viewport dimensions (as fractions of the window)
-//     float sizeX = 1.0f;
-//     float sizeY = 1.0f;
-//     float posX = 0.0f;
-//     float posY = 0.0f;
+    // Draw vertical lines
+    for (float x = 0; x <= gameSize.x; x += gridSize)
+    {
+        std::array line = {
+            sf::Vertex(sf::Vector2f(x, 0), sf::Color(100, 100, 100)),
+            sf::Vertex(sf::Vector2f(x, gameSize.y), sf::Color(100, 100, 100))};
+        mRenderTexture.draw(line.data(), line.size(), sf::PrimitiveType::Lines);
+    }
 
-//     // Determine whether horizontal or vertical letterboxing is needed
-//     if (windowRatio < viewRatio)
-//     {
-//         // The window is too narrow: add black bars on the left and right.
-//         sizeX = viewRatio / windowRatio;
-//         posX = (1.0f - sizeX) / 2.0f;
-//     }
-//     else
-//     {
-//         // The window is too wide: add black bars on the top and bottom.
-//         sizeY = windowRatio / viewRatio;
-//         posY = (1.0f - sizeY) / 2.0f;
-//     }
+    // Draw horizontal lines
+    for (float y = 0; y <= gameSize.y; y += gridSize)
+    {
+        sf::Vertex line[] = {
+            sf::Vertex(sf::Vector2f(0, y), sf::Color(100, 100, 100)),
+            sf::Vertex(sf::Vector2f(gameSize.x, y), sf::Color(100, 100, 100))};
+        mRenderTexture.draw(line, 2, sf::PrimitiveType::Lines);
+    }
+}
 
-//     // Set the viewport of the view (values between 0 and 1)
-//     view.setViewport(sf::FloatRect({posX, posY}, {sizeX, sizeY}));
-
-//     return view;
-// }
+void Renderer::drawBorder()
+{
+    // Draw a red line of 1 game unit around the edge
+    sf::RectangleShape border(sf::Vector2f(SimulationConfig::getInstance().gameSize().x - 2, SimulationConfig::getInstance().gameSize().y - 2));
+    border.setPosition({1, 1});
+    border.setFillColor(sf::Color::Transparent);
+    border.setOutlineThickness(1);
+    border.setOutlineColor(sf::Color::Red);
+    mRenderTexture.draw(border);
+}

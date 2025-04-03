@@ -13,6 +13,7 @@ class ParticleSystem
 public:
     ParticleSystem();
 
+    void initialize();
     void update(sf::Time aDeltaTime);
     void reset();
     const std::vector<Particle>& getParticles() const;
