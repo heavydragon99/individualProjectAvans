@@ -29,6 +29,7 @@ private:
     void checkBoundary();
     void updateDensities();
     void updateForces(sf::Time aDeltaTime);
+    void updatePositions(sf::Time aDeltaTime);
 
     float smoothingKernel(float aRadius, float aDistance);
     float smoothingKernelDerivative(float aRadius, float aDistance);

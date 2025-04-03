@@ -27,8 +27,9 @@ void Physics::update(sf::Time aDeltaTime)
     mQuadTree.update();
     applyGravity(aDeltaTime);
     updateDensities();
-    checkBoundary();
     updateForces(aDeltaTime);
+    updatePositions(aDeltaTime);
+    checkBoundary();
 }
 
 void Physics::applyGravity(sf::Time aDeltaTime)
@@ -36,7 +37,6 @@ void Physics::applyGravity(sf::Time aDeltaTime)
     for (auto &particle : mParticles)
     {
         particle.mVelocity.y += GRAVITY * aDeltaTime.asSeconds();          // Apply gravity.
-        particle.mPosition += particle.mVelocity * aDeltaTime.asSeconds(); // Update position.
     }
 }
 
@@ -90,6 +90,14 @@ void Physics::updateForces(sf::Time aDeltaTime)
         sf::Vector2f pressureForce = calculatePressureForce(particleIndex);
         sf::Vector2f pressureAcceleration = pressureForce / mDensities[particleIndex];
         mParticles[particleIndex].mVelocity += pressureAcceleration * aDeltaTime.asSeconds();
+    }
+}
+
+void Physics::updatePositions(sf::Time aDeltaTime)
+{
+    for (auto &particle : mParticles)
+    {
+        particle.mPosition += particle.mVelocity * aDeltaTime.asSeconds();
     }
 }
 
