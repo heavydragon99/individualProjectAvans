@@ -7,7 +7,7 @@ SimulationConfig &SimulationConfig::getInstance()
 }
 
 SimulationConfig::SimulationConfig()
-    : mSimulationState(SimulationState::SETUP), mParticleCount(1000), mParticleRadius(8.f), mSimulationSpeed(1), mParticleSpacing(30), mGameSize({1920, 1080}), mWindowSize({1920, 1080}), mSmoothingRadius(50), mTargetDensity(10), mPressureMultiplier(100) {}
+    : mSimulationState(SimulationState::SETUP), mParticleCount(1000), mParticleRadius(5.f), mParticleSpacing(15), mGameSize({1920, 1080}), mWindowSize({1920, 1080}), mSmoothingRadius(50), mTargetDensity(10), mPressureMultiplier(100) {}
 
 SimulationState SimulationConfig::simulationState() const { return mSimulationState; }
 void SimulationConfig::simulationState(SimulationState aState) { mSimulationState = aState; }
@@ -31,9 +31,6 @@ void SimulationConfig::particleRadius(float aRadius)
         onParticleRadiusChanged();
     }
 }
-
-int SimulationConfig::simulationSpeed() const { return mSimulationSpeed; }
-void SimulationConfig::simulationSpeed(int aSpeed) { mSimulationSpeed = aSpeed; }
 
 int SimulationConfig::particleSpacing() const { return mParticleSpacing; }
 void SimulationConfig::particleSpacing(int aSpacing)

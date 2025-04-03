@@ -29,18 +29,6 @@ void SimulationGUI::renderControlsSetup()
         config.simulationState(SimulationState::INITIALIZING);
     }
 
-    // Simulation speed
-    int speed = config.simulationSpeed();
-    if (ImGui::InputInt("Simulation Speed", &speed)) {
-        if (speed < 1) {
-            speed = 1;
-        }
-        if (speed > 10) {
-            speed = 10;
-        }
-        config.simulationSpeed(speed);
-    }
-
     // Particle count
     unsigned int count = config.particleCount();
     if (ImGui::InputInt("Particle Count", (int *)&count)) {
@@ -130,21 +118,6 @@ void SimulationGUI::renderControlsRunning()
     // Reset button
     if (ImGui::Button("Reset")) {
         config.simulationState(SimulationState::RESET);
-    }
-
-    // Simulation speed
-    int speed = config.simulationSpeed();
-    if (ImGui::InputInt("Simulation Speed", &speed))
-    {
-        if (speed < 1)
-        {
-            speed = 1;
-        }
-        if (speed > 10)
-        {
-            speed = 10;
-        }
-        config.simulationSpeed(speed);
     }
 
     // Smoothing radius

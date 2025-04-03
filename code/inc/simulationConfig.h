@@ -28,9 +28,6 @@ public:
     float particleRadius() const;
     void particleRadius(float aRadius);
 
-    int simulationSpeed() const;
-    void simulationSpeed(int aSpeed);
-
     int particleSpacing() const;
     void particleSpacing(int aSpacing);
 
@@ -63,7 +60,6 @@ private:
     SimulationState mSimulationState;
     unsigned int mParticleCount;
     float mParticleRadius;
-    int mSimulationSpeed;
     int mParticleSpacing;
     sf::Vector2u mGameSize;
     sf::Vector2u mWindowSize;
