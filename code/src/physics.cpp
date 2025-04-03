@@ -39,7 +39,7 @@ void Physics::applyGravity(sf::Time aDeltaTime)
     {
         Particle &particle = mParticles[i];
         particle.mVelocity.y += GRAVITY * aDeltaTime.asSeconds();          // Apply gravity.
-        mPredictedPositions[i] = particle.mPosition + particle.mVelocity * aDeltaTime.asSeconds(); // Predict new position.
+        mPredictedPositions[i] = particle.mPosition + particle.mVelocity * (1.0f / 120.0f); // Predict new position.
     }
 }
 
