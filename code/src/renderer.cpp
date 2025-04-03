@@ -2,8 +2,8 @@
 
 #include "simulationConfig.h"
 
+#include <cmath>
 #include <iostream>
-
 Renderer::Renderer()
     : mWindow(sf::VideoMode(getScreenSize()), "Fluid Simulation")
 {
@@ -116,12 +116,52 @@ sf::View Renderer::getLetterboxView(const sf::Vector2u &gameSize, int windowWidt
 
 void Renderer::drawParticles(const ParticleSystem &particleSystem)
 {
+    sf::Vector2f maxVelocity = {150.0f, 150.0f};
+    sf::Vector2f minVelocity = {20.0f, 20.0f};
+
+    float maxSpeedMagnitude = std::sqrt(maxVelocity.x * maxVelocity.x + maxVelocity.y * maxVelocity.y);
+    float minSpeedMagnitude = std::sqrt(minVelocity.x * minVelocity.x + minVelocity.y * minVelocity.y);
+
     sf::CircleShape particle;
-    particle.setFillColor(sf::Color::White);
     particle.setRadius(particleSystem.getParticles().front().mRadius);
     particle.setOrigin({particleSystem.getParticles().front().mRadius, particleSystem.getParticles().front().mRadius});
+
     for (const auto &p : particleSystem.getParticles())
     {
+        // Calculate the velocity magnitude of the particle
+        float velocityMagnitude = std::sqrt(p.mVelocity.x * p.mVelocity.x + p.mVelocity.y * p.mVelocity.y);
+        velocityMagnitude -= minSpeedMagnitude;               // Normalize to start from 0
+        velocityMagnitude = std::max(0.f, velocityMagnitude); // Ensure it's not negative
+
+        // Normalize the velocity magnitude to a range of 0 to 1
+        float normalizedVelocity = std::clamp(velocityMagnitude / maxSpeedMagnitude, 0.0f, 1.f);
+
+        // Interpolate color based on normalized velocity
+        uint8_t red = 0, green = 0, blue = 0;
+        if (normalizedVelocity < 0.5f)
+        {
+            // From blue to green
+            float t = normalizedVelocity / 0.5f;
+            blue = static_cast<uint8_t>(255 * (1.f - t));
+            green = static_cast<uint8_t>(255 * t);
+        }
+        else if (normalizedVelocity < 0.75f)
+        {
+            // From green to yellow
+            float t = (normalizedVelocity - 0.5f) / 0.25f;
+            green = 255;
+            red = static_cast<uint8_t>(255 * t);
+        }
+        else
+        {
+            // From yellow to red
+            float t = (normalizedVelocity - 0.75f) / 0.25f;
+            red = 255;
+            green = static_cast<uint8_t>(255 * (1.f - t));
+        }
+
+        particle.setFillColor(sf::Color(red, green, blue));
+
         particle.setPosition(p.mPosition);
         mRenderTexture.draw(particle);
     }
