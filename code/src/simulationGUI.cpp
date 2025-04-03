@@ -132,6 +132,21 @@ void SimulationGUI::renderControlsRunning()
         config.simulationState(SimulationState::RESET);
     }
 
+    // Simulation speed
+    int speed = config.simulationSpeed();
+    if (ImGui::InputInt("Simulation Speed", &speed))
+    {
+        if (speed < 1)
+        {
+            speed = 1;
+        }
+        if (speed > 10)
+        {
+            speed = 10;
+        }
+        config.simulationSpeed(speed);
+    }
+
     // Smoothing radius
     float smoothingRadius = config.smoothingRadius();
     if (ImGui::InputFloat("Smoothing Radius", &smoothingRadius))
