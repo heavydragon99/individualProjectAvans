@@ -20,6 +20,7 @@ void Physics::initialize()
 {
     mQuadTree.initialize();
     mDensities.resize(mParticles.size());
+    mPredictedPositions.resize(mParticles.size());
 }
 
 void Physics::update(sf::Time aDeltaTime)
@@ -34,9 +35,11 @@ void Physics::update(sf::Time aDeltaTime)
 
 void Physics::applyGravity(sf::Time aDeltaTime)
 {
-    for (auto &particle : mParticles)
+    for (size_t i = 0; i < mParticles.size(); ++i)
     {
+        Particle &particle = mParticles[i];
         particle.mVelocity.y += GRAVITY * aDeltaTime.asSeconds();          // Apply gravity.
+        mPredictedPositions[i] = particle.mPosition + particle.mVelocity * aDeltaTime.asSeconds(); // Predict new position.
     }
 }
 
@@ -134,8 +137,8 @@ float Physics::calculateDensity(int aParticleIndex)
     for (size_t neighborIndex : neighbors)
     {
         float distance = std::hypot(
-            mParticles[neighborIndex].mPosition.x - sampleParticle.mPosition.x,
-            mParticles[neighborIndex].mPosition.y - sampleParticle.mPosition.y);
+            mPredictedPositions[neighborIndex].x - mPredictedPositions[aParticleIndex].x,
+            mPredictedPositions[neighborIndex].y - mPredictedPositions[aParticleIndex].y);
         float influence = smoothingKernel(smoothingRadius, distance);
         density += mass * influence;
     }
@@ -158,7 +161,7 @@ sf::Vector2f Physics::calculatePressureForce(int aParticleIndex)
             continue;
         }
 
-        sf::Vector2f offset = mParticles[neighborIndex].mPosition - mParticles[aParticleIndex].mPosition;
+        sf::Vector2f offset = mPredictedPositions[neighborIndex] - mPredictedPositions[aParticleIndex];
         float distance = std::hypot(offset.x, offset.y);
         sf::Vector2f direction = (distance == 0.0f) ? sf::Vector2f{0.0f, 0.0f} : offset / distance;
 

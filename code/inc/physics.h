@@ -42,6 +42,7 @@ private:
     LinearQuadTree mQuadTree;
     std::vector<Particle> &mParticles;
     std::vector<float> mDensities;
+    std::vector<sf::Vector2f> mPredictedPositions;
 };
 
 #endif // PHYSICS_H
