@@ -66,20 +66,29 @@ void LinearQuadTree::update()
 
 std::vector<size_t> LinearQuadTree::findNeighbors(const Particle &aQueryParticle, float aSearchRadius) const
 {
-    uint32_t mortonCode = mortonEncode(aQueryParticle.mPosition.x, aQueryParticle.mPosition.y, mGridSize);
+    // Determine the query particle's cell coordinates.
+    uint32_t cellX = static_cast<uint32_t>(aQueryParticle.mPosition.x / mGridSize);
+    uint32_t cellY = static_cast<uint32_t>(aQueryParticle.mPosition.y / mGridSize);
+
     std::vector<size_t> neighbors;
 
-    // Search the particle's cell and adjacent cells
+    // Search the particle's cell and adjacent cells.
     for (int dx = -1; dx <= 1; dx++)
     {
         for (int dy = -1; dy <= 1; dy++)
         {
-            QuadtreeNode neighborNode = {mortonCode + dx + dy * mGridSize, 0};
+            uint32_t neighborX = cellX + dx;
+            uint32_t neighborY = cellY + dy;
+            uint32_t neighborMorton = (interleaveBits(neighborX) | (interleaveBits(neighborY) << 1));
+
+            // Find nodes in the neighbor cell.
+            QuadtreeNode searchNode = {neighborMorton, 0};
             auto range = std::equal_range(
-                mNodes.begin(), mNodes.end(), neighborNode,
+                mNodes.begin(), mNodes.end(), searchNode,
                 [](const QuadtreeNode &a, const QuadtreeNode &b)
                 { return a.mortonCode < b.mortonCode; });
 
+            // Check each candidate.
             for (auto it = range.first; it != range.second; ++it)
             {
                 int neighborIndex = it->particleIndex;
@@ -88,7 +97,6 @@ std::vector<size_t> LinearQuadTree::findNeighbors(const Particle &aQueryParticle
                     mParticles[neighborIndex].mPosition.y - aQueryParticle.mPosition.y);
                 if (dist < aSearchRadius)
                 {
-                    // Check if the particle is already in the neighbors list
                     if (std::find(neighbors.begin(), neighbors.end(), neighborIndex) == neighbors.end())
                     {
                         neighbors.push_back(neighborIndex);
