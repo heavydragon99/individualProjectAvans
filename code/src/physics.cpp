@@ -46,11 +46,11 @@ void Physics::externalForces(sf::Time aDeltaTime)
         mousePos = SimulationConfig::getInstance().mousePosition();
         if (SimulationConfig::getInstance().isMousePressedLeft())
         {
-            forceMagnitude = -4.f * SimulationConfig::getInstance().pressureMultiplier();
+            forceMagnitude = -40.f;
         }
         else
         {
-            forceMagnitude = 1.f * SimulationConfig::getInstance().pressureMultiplier();
+            forceMagnitude = 10.f ;
         }
     }
     for (auto &particle : mParticles)
@@ -74,8 +74,10 @@ void Physics::externalForces(sf::Time aDeltaTime)
             interactionForce = sf::Vector2f(0.f, gravity) * gravityWeight + dirToCentre * centreT * forceMagnitude;
             interactionForce -= particle.mVelocity * centreT;
         }
-        // Apply the force to the particle
-        particle.mVelocity += interactionForce * aDeltaTime.asSeconds();
+
+        // Apply gravity to all particles
+        sf::Vector2f gravityForce = {0.f, gravity};
+        particle.mVelocity += (gravityForce + interactionForce) * aDeltaTime.asSeconds();
     }
 }
 
@@ -229,6 +231,7 @@ float Physics::convertDensityToPressure(float aDensity)
 {
     float densityError = aDensity - SimulationConfig::getInstance().targetDensity();
     float pressure = SimulationConfig::getInstance().pressureMultiplier() * densityError;
+
     return pressure;
 }
 
@@ -271,6 +274,6 @@ void Physics::predictPositions(sf::Time aDeltaTime)
     for (size_t i = 0; i < mParticles.size(); ++i)
     {
         Particle &particle = mParticles[i];
-        mPredictedPositions[i] = particle.mPosition + particle.mVelocity * 1.f / 120.f;
+        mPredictedPositions[i] = particle.mPosition + particle.mVelocity * 1.f / 60.f;
     }
 }
