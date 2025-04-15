@@ -7,7 +7,7 @@ SimulationConfig &SimulationConfig::getInstance()
 }
 
 SimulationConfig::SimulationConfig()
-    : mSimulationState(SimulationState::SETUP), mParticleCount(1500), mParticleRadius(2.f), mParticleSpacing(6), mGameSize({640, 360}), mWindowSize({1920, 1080}), mSmoothingRadius(15), mTargetDensity(5), mPressureMultiplier(10) {}
+    : mSimulationState(SimulationState::SETUP), mParticleCount(2500), mParticleRadius(2.f), mParticleSpacing(5), mGameSize({640, 360}), mWindowSize({1920, 1080}), mSmoothingRadius(10), mTargetDensity(5), mPressureMultiplier(10), mViscosityMultiplier(0.4), mGravity(9.81) {}
 
 SimulationState SimulationConfig::simulationState() const { return mSimulationState; }
 void SimulationConfig::simulationState(SimulationState aState) { mSimulationState = aState; }
@@ -56,6 +56,12 @@ void SimulationConfig::targetDensity(float aDensity) { mTargetDensity = aDensity
 
 float SimulationConfig::pressureMultiplier() const { return mPressureMultiplier; }
 void SimulationConfig::pressureMultiplier(float aMultiplier) { mPressureMultiplier = aMultiplier; }
+
+float SimulationConfig::viscosityMultiplier() const { return mViscosityMultiplier; }
+void SimulationConfig::viscosityMultiplier(float aMultiplier) { mViscosityMultiplier = aMultiplier; }
+
+float SimulationConfig::gravity() const { return mGravity; }
+void SimulationConfig::gravity(float aGravity) { mGravity = aGravity; }
 
 void SimulationConfig::setOnParticleCountChanged(const std::function<void()> &callback) { onParticleCountChanged = callback; }
 void SimulationConfig::setOnParticleRadiusChanged(const std::function<void()> &callback) { onParticleRadiusChanged = callback; }

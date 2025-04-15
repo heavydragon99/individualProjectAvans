@@ -97,10 +97,34 @@ void SimulationGUI::renderControlsSetup()
         if (pressureMultiplier < 0.05f) {
             pressureMultiplier = 0.05f;
         }
-        if (pressureMultiplier > 10000.f) {
-            pressureMultiplier = 10000.f;
+        if (pressureMultiplier > 100.f) {
+            pressureMultiplier = 100.f;
         }
         config.pressureMultiplier(pressureMultiplier);
+    }
+
+    // Viscosity multiplier
+    float viscosityMultiplier = config.viscosityMultiplier();
+    if (ImGui::InputFloat("Viscosity Multiplier", &viscosityMultiplier)) {
+        if (viscosityMultiplier < 0.0f) {
+            viscosityMultiplier = 0.0f;
+        }
+        if (viscosityMultiplier > 100.f) {
+            viscosityMultiplier = 100.f;
+        }
+        config.viscosityMultiplier(viscosityMultiplier);
+    }
+
+    // Gravity
+    float gravity = config.gravity();
+    if (ImGui::InputFloat("Gravity", &gravity)) {
+        if (gravity < 0.0f) {
+            gravity = 0.0f;
+        }
+        if (gravity > 100.f) {
+            gravity = 100.f;
+        }
+        config.gravity(gravity);
     }
 }
 
@@ -160,11 +184,41 @@ void SimulationGUI::renderControlsRunning()
         {
             pressureMultiplier = 0.5f;
         }
-        if (pressureMultiplier > 10000.f)
+        if (pressureMultiplier > 100.f)
         {
-            pressureMultiplier = 10000.f;
+            pressureMultiplier = 100.f;
         }
         config.pressureMultiplier(pressureMultiplier);
+    }
+
+    // Viscosity multiplier
+    float viscosityMultiplier = config.viscosityMultiplier();
+    if (ImGui::InputFloat("Viscosity Multiplier", &viscosityMultiplier))
+    {
+        if (viscosityMultiplier < 0.0f)
+        {
+            viscosityMultiplier = 0.0f;
+        }
+        if (viscosityMultiplier > 100.f)
+        {
+            viscosityMultiplier = 100.f;
+        }
+        config.viscosityMultiplier(viscosityMultiplier);
+    }
+
+    // Gravity
+    float gravity = config.gravity();
+    if (ImGui::InputFloat("Gravity", &gravity))
+    {
+        if (gravity < 0.0f)
+        {
+            gravity = 0.0f;
+        }
+        if (gravity > 100.f)
+        {
+            gravity = 100.f;
+        }
+        config.gravity(gravity);
     }
 }
 

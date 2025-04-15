@@ -46,6 +46,12 @@ public:
     float pressureMultiplier() const;
     void pressureMultiplier(float aMultiplier);
 
+    float viscosityMultiplier() const;
+    void viscosityMultiplier(float aMultiplier);
+
+    float gravity() const;
+    void gravity(float aGravity);
+
     // Callback setters
     void setOnParticleCountChanged(const std::function<void()> &callback);
     void setOnParticleRadiusChanged(const std::function<void()> &callback);
@@ -66,6 +72,8 @@ private:
     float mSmoothingRadius;
     float mTargetDensity;
     float mPressureMultiplier;
+    float mViscosityMultiplier;
+    float mGravity;
 
     // Callbacks
     std::function<void()> onParticleCountChanged;
