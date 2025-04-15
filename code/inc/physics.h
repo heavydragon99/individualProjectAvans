@@ -9,7 +9,7 @@
 #include <vector>
 
 #define GRAVITY 9.8f
-#define COLLISION_DAMPING 0.8f
+#define COLLISION_DAMPING 1.0f
 
 extern "C"
 {
