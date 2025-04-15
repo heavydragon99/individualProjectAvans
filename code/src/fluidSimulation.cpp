@@ -45,18 +45,13 @@ void FluidSimulation::processEvents()
         {
             mRenderer.close();
         }
-        else if (const auto *resized = event->getIf<sf::Event::Resized>())
-        {
-            SimulationConfig::getInstance().windowSize({resized->size.x, resized->size.y});
-            mRenderer.resize(sf::Vector2u({resized->size.x, resized->size.y}));
-        }
         if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
         {
-            mParticleSystem.applyMouseForce(mRenderer.getWindow().mapPixelToCoords({sf::Mouse::getPosition(mRenderer.getWindow()).x, sf::Mouse::getPosition(mRenderer.getWindow()).y}), -5.f);
+            mParticleSystem.applyMouseForce(mRenderer.getWindow().mapPixelToCoords({sf::Mouse::getPosition(mRenderer.getWindow()).x, sf::Mouse::getPosition(mRenderer.getWindow()).y}), -10.f);
         }
         else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
         {
-            mParticleSystem.applyMouseForce(mRenderer.getWindow().mapPixelToCoords({sf::Mouse::getPosition(mRenderer.getWindow()).x, sf::Mouse::getPosition(mRenderer.getWindow()).y}), 5.f);
+            mParticleSystem.applyMouseForce(mRenderer.getWindow().mapPixelToCoords({sf::Mouse::getPosition(mRenderer.getWindow()).x, sf::Mouse::getPosition(mRenderer.getWindow()).y}), 10.f);
         }
 
     }
