@@ -21,15 +21,19 @@ void FluidSimulation::run()
     sf::Clock guiClock;
     sf::Time timeSinceLastGuiUpdate = sf::Time::Zero;
 
+    float fps = 0;
+    sf::Clock fpsClock;
+
     while (mRenderer.isWindowOpen())
     {
-        mDeltaTime = mDeltaClock.restart() * 2.f;
+        mDeltaTime = mDeltaClock.restart();
+        fps = 1.f / fpsClock.restart().asSeconds(); // Calculate FPS
         processEvents();
         update();
         timeSinceLastGuiUpdate += guiClock.restart();
         if (timeSinceLastGuiUpdate >= updateInterval)
         {
-            render();
+            render(fps); // Pass FPS to render
             timeSinceLastGuiUpdate = sf::Time::Zero;
         }
     }
@@ -77,10 +81,10 @@ void FluidSimulation::update()
     }
 }
 
-void FluidSimulation::render()
+void FluidSimulation::render(float fps)
 {
     mRenderer.clear();
     mRenderer.render(mParticleSystem);
-    mGUI.showUI(mRenderer.getWindow(), mDeltaTime);
+    mGUI.showUI(mRenderer.getWindow(), mDeltaTime, fps);
     mRenderer.display();
 }

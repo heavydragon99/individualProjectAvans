@@ -9,11 +9,12 @@
 class SimulationGUI
 {
 public:
-    void showUI(sf::RenderWindow& window, sf::Time deltaTime);
+    void showUI(sf::RenderWindow& window, sf::Time deltaTime, float fps);
 
 private:
     void renderControlsSetup();
     void renderControlsRunning();
+    void showFPS(float fps);
 };
 
 #endif // SIMULATION_GUI_H

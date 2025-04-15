@@ -19,7 +19,7 @@ public:
 private:
     void processEvents();
     void update();
-    void render();
+    void render(float fps);
     void showUI();
 
     sf::Clock mDeltaClock;

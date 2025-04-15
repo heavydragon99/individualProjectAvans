@@ -1,12 +1,14 @@
 #include "simulationGUI.h"
 
-void SimulationGUI::showUI(sf::RenderWindow &window, sf::Time deltaTime)
+void SimulationGUI::showUI(sf::RenderWindow &window, sf::Time deltaTime, float fps)
 {
     ImGui::SFML::Update(window, deltaTime);
 
     ImGui::SetNextWindowSize({250, 0.0f}, ImGuiCond_Always);
     ImGui::Begin("Simulation Controls");
     ImGui::PushItemWidth(100);
+
+    showFPS(fps);
 
     auto &config = SimulationConfig::getInstance();
     if (config.simulationState() == SimulationState::SETUP) {
@@ -164,4 +166,18 @@ void SimulationGUI::renderControlsRunning()
         }
         config.pressureMultiplier(pressureMultiplier);
     }
+}
+
+void SimulationGUI::showFPS(float fps)
+{
+    static int frameCounter = 0;
+    static float displayedFPS = 0.0f;
+
+    frameCounter++;
+    if (frameCounter >= 30) {
+        displayedFPS = fps;
+        frameCounter = 0;
+    }
+
+    ImGui::Text("FPS: %.1f", displayedFPS);
 }
