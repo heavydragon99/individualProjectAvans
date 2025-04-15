@@ -16,7 +16,7 @@ FluidSimulation::FluidSimulation()
 
 void FluidSimulation::run()
 {
-    const sf::Time updateInterval = sf::seconds(1.f / 60.f);
+    const sf::Time updateIntervalGui = sf::seconds(1.f / 60.f);
     mDeltaTime = mDeltaClock.restart();
     sf::Clock guiClock;
     sf::Time timeSinceLastGuiUpdate = sf::Time::Zero;
@@ -27,12 +27,12 @@ void FluidSimulation::run()
     while (mRenderer.isWindowOpen())
     {
         mDeltaTime = mDeltaClock.restart() * 2.f;
-        fps = 1.f / fpsClock.restart().asSeconds(); // Calculate FPS
         processEvents();
         update();
         timeSinceLastGuiUpdate += guiClock.restart();
-        if (timeSinceLastGuiUpdate >= updateInterval)
+        if (timeSinceLastGuiUpdate >= updateIntervalGui)
         {
+            fps = 1.f / fpsClock.restart().asSeconds(); // Calculate FPS
             render(fps); // Pass FPS to render
             timeSinceLastGuiUpdate = sf::Time::Zero;
         }
