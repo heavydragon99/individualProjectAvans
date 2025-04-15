@@ -72,9 +72,9 @@ void ParticleSystem::spawnParticles()
     int particlesPerColumn = (numParticles - 1) / particlesPerRow + 1;
 
     // Calculate offsets to center the grid.
-    sf::Vector2u windowSize = config.windowSize();
-    float offsetX = windowSize.x * 0.5f;
-    float offsetY = windowSize.y * 0.5f;
+    sf::Vector2u gameSize = config.gameSize();
+    float offsetX = gameSize.x * 0.5f;
+    float offsetY = gameSize.y * 0.5f;
 
     float particleRadius = config.particleRadius();
     float particleSpacing = config.particleSpacing();

@@ -66,7 +66,7 @@ void Physics::applyGravity(sf::Time aDeltaTime)
 
 void Physics::checkBoundary()
 {
-    const sf::Vector2u windowSize = SimulationConfig::getInstance().windowSize();
+    const sf::Vector2u gameSize = SimulationConfig::getInstance().gameSize();
     for (auto &particle : mParticles)
     {
         // Simple boundary collision detection.
@@ -75,9 +75,9 @@ void Physics::checkBoundary()
             particle.mPosition.x = particle.mRadius;
             particle.mVelocity.x = -particle.mVelocity.x * COLLISION_DAMPING;
         }
-        else if (particle.mPosition.x > windowSize.x - particle.mRadius)
+        else if (particle.mPosition.x > gameSize.x - particle.mRadius)
         {
-            particle.mPosition.x = windowSize.x - particle.mRadius;
+            particle.mPosition.x = gameSize.x - particle.mRadius;
             particle.mVelocity.x = -particle.mVelocity.x * COLLISION_DAMPING;
         }
         if (particle.mPosition.y < particle.mRadius)
@@ -85,9 +85,9 @@ void Physics::checkBoundary()
             particle.mPosition.y = particle.mRadius;
             particle.mVelocity.y = -particle.mVelocity.y * COLLISION_DAMPING;
         }
-        else if (particle.mPosition.y > windowSize.y - particle.mRadius)
+        else if (particle.mPosition.y > gameSize.y - particle.mRadius)
         {
-            particle.mPosition.y = windowSize.y - particle.mRadius;
+            particle.mPosition.y = gameSize.y - particle.mRadius;
             particle.mVelocity.y = -particle.mVelocity.y * COLLISION_DAMPING;
         }
     }
