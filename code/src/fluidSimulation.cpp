@@ -45,15 +45,17 @@ void FluidSimulation::processEvents()
         {
             mRenderer.close();
         }
-        if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+        if (SimulationConfig::getInstance().simulationState() == SimulationState::RUNNING)
         {
-            mParticleSystem.applyMouseForce(mRenderer.getWindow().mapPixelToCoords({sf::Mouse::getPosition(mRenderer.getWindow()).x, sf::Mouse::getPosition(mRenderer.getWindow()).y}), -10.f);
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+            {
+                mParticleSystem.applyMouseForce(mRenderer.getWindow().mapPixelToCoords({sf::Mouse::getPosition(mRenderer.getWindow()).x, sf::Mouse::getPosition(mRenderer.getWindow()).y}), -10.f);
+            }
+            else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
+            {
+                mParticleSystem.applyMouseForce(mRenderer.getWindow().mapPixelToCoords({sf::Mouse::getPosition(mRenderer.getWindow()).x, sf::Mouse::getPosition(mRenderer.getWindow()).y}), 10.f);
+            }
         }
-        else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
-        {
-            mParticleSystem.applyMouseForce(mRenderer.getWindow().mapPixelToCoords({sf::Mouse::getPosition(mRenderer.getWindow()).x, sf::Mouse::getPosition(mRenderer.getWindow()).y}), 10.f);
-        }
-
     }
 }
 
