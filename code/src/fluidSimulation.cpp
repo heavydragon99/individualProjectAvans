@@ -26,7 +26,7 @@ void FluidSimulation::run()
 
     while (mRenderer.isWindowOpen())
     {
-        mDeltaTime = mDeltaClock.restart();
+        mDeltaTime = mDeltaClock.restart() * 2.f;
         fps = 1.f / fpsClock.restart().asSeconds(); // Calculate FPS
         processEvents();
         update();
@@ -58,11 +58,11 @@ void FluidSimulation::processEvents()
             mousePos.y = (mousePos.y / mRenderer.getWindow().getSize().y) * SimulationConfig::getInstance().gameSize().y;
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
             {
-                mParticleSystem.applyMouseForce({mousePos.x,mousePos.y}, -10.f);
+                mParticleSystem.applyMouseForce({mousePos.x,mousePos.y}, -1.f * SimulationConfig::getInstance().pressureMultiplier());
             }
             else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
             {
-                mParticleSystem.applyMouseForce({mousePos.x, mousePos.y}, 10.f);
+                mParticleSystem.applyMouseForce({mousePos.x, mousePos.y}, 1.f * SimulationConfig::getInstance().pressureMultiplier());
             }
         }
     }

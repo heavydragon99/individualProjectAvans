@@ -42,11 +42,15 @@ void Physics::applyMouseForce(const sf::Vector2f &aMousePosition, float aForceMa
         float sqrDistance = std::hypot(offset.x, offset.y);
 
         //If particle is within the interaction radius
-        if (sqrDistance < 150.f)
+        int width = SimulationConfig::getInstance().gameSize().x;
+        int height = SimulationConfig::getInstance().gameSize().y;
+        int radius = std::min(width * 0.1, height * 0.1);
+
+        if (sqrDistance < radius)
         {
             float distance = std::sqrt(sqrDistance);
             sf::Vector2f dirToMouse = distance <= 0.0f ? sf::Vector2f{0.0f, 0.0f} : offset / distance;
-            float centreT = 1 - (distance / 150.f);
+            float centreT = 1 - (distance / (float)radius);
             interactionForce += (dirToMouse * aForceMagnitude - particle.mVelocity) * centreT;
         }
         // Apply the force to the particle
