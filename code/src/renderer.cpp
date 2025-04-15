@@ -70,8 +70,8 @@ sf::Vector2u Renderer::getScreenSize() const
 
 void Renderer::drawParticles(const ParticleSystem &particleSystem)
 {
-    sf::Vector2f maxVelocity = {100.0f, 100.0f};
-    sf::Vector2f minVelocity = {0.0f, 0.0f};
+    sf::Vector2f maxVelocity = {30.0f, 30.0f};
+    sf::Vector2f minVelocity = {3.0f, 3.0f};
 
     float maxSpeedMagnitude = std::sqrt(maxVelocity.x * maxVelocity.x + maxVelocity.y * maxVelocity.y);
     float minSpeedMagnitude = std::sqrt(minVelocity.x * minVelocity.x + minVelocity.y * minVelocity.y);
