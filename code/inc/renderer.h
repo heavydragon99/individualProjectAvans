@@ -14,7 +14,6 @@ public:
     void render(ParticleSystem &particleSystem);
     void display();
     bool isWindowOpen() const;
-    void resize(const sf::Vector2u &screenSize);
     void close();
     sf::RenderWindow &getWindow() { return mWindow; }
 
