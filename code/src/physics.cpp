@@ -26,22 +26,39 @@ void Physics::initialize()
 void Physics::update(sf::Time aDeltaTime)
 {
     mQuadTree.update();
-    applyGravity(aDeltaTime);
+    predictPositions(aDeltaTime);
+    externalForces(aDeltaTime);
     updateDensities();
     updateForces(aDeltaTime);
     updatePositions(aDeltaTime);
     checkBoundary();
 }
 
-void Physics::applyMouseForce(const sf::Vector2f &aMousePosition, float aForceMagnitude)
+void Physics::externalForces(sf::Time aDeltaTime)
 {
+    float gravity = SimulationConfig::getInstance().gravity();
+    bool isMousePressed = SimulationConfig::getInstance().isMousePressedLeft() || SimulationConfig::getInstance().isMousePressedRight();
+    float forceMagnitude = 0.f;
+    sf::Vector2f mousePos{0.f, 0.f};
+    if (isMousePressed)
+    {
+        // Calculate mouse coordinates
+        mousePos = SimulationConfig::getInstance().mousePosition();
+        if (SimulationConfig::getInstance().isMousePressedLeft())
+        {
+            forceMagnitude = -4.f * SimulationConfig::getInstance().pressureMultiplier();
+        }
+        else
+        {
+            forceMagnitude = 1.f * SimulationConfig::getInstance().pressureMultiplier();
+        }
+    }
     for (auto &particle : mParticles)
     {
         sf::Vector2f interactionForce = {0.f, 0.f};
-        sf::Vector2f offset = aMousePosition - particle.mPosition;
+        sf::Vector2f offset = mousePos - particle.mPosition;
         float sqrDistance = std::hypot(offset.x, offset.y);
 
-        //If particle is within the interaction radius
         int width = SimulationConfig::getInstance().gameSize().x;
         int height = SimulationConfig::getInstance().gameSize().y;
         int radius = std::min(width * 0.1, height * 0.1);
@@ -49,22 +66,16 @@ void Physics::applyMouseForce(const sf::Vector2f &aMousePosition, float aForceMa
         if (sqrDistance < radius)
         {
             float distance = std::sqrt(sqrDistance);
-            sf::Vector2f dirToMouse = distance <= 0.0f ? sf::Vector2f{0.0f, 0.0f} : offset / distance;
-            float centreT = 1 - (distance / (float)radius);
-            interactionForce += (dirToMouse * aForceMagnitude - particle.mVelocity) * centreT;
+            float edgeT = distance / radius;
+            float centreT = 1 - edgeT;
+            sf::Vector2f dirToCentre = offset / distance;
+
+            float gravityWeight = 1 - centreT;
+            interactionForce = sf::Vector2f(0.f, gravity) * gravityWeight + dirToCentre * centreT * forceMagnitude;
+            interactionForce -= particle.mVelocity * centreT;
         }
         // Apply the force to the particle
-        particle.mVelocity += interactionForce;
-    }
-}
-
-void Physics::applyGravity(sf::Time aDeltaTime)
-{
-    for (size_t i = 0; i < mParticles.size(); ++i)
-    {
-        Particle &particle = mParticles[i];
-        // particle.mVelocity.y += GRAVITY * aDeltaTime.asSeconds();          // Apply gravity.
-        mPredictedPositions[i] = particle.mPosition + particle.mVelocity * (1.0f / 120.0f); // Predict new position.
+        particle.mVelocity += interactionForce * aDeltaTime.asSeconds();
     }
 }
 
@@ -115,9 +126,12 @@ void Physics::updateForces(sf::Time aDeltaTime)
         {
             continue; // Skip if density is zero or negative.
         }
+
         sf::Vector2f pressureForce = calculatePressureForce(particleIndex);
-        sf::Vector2f pressureAcceleration = pressureForce / mDensities[particleIndex];
-        mParticles[particleIndex].mVelocity += pressureAcceleration * aDeltaTime.asSeconds();
+        sf::Vector2f viscosityForce = calculateViscosityForce(particleIndex); // Add viscosity force calculation.
+
+        sf::Vector2f totalAcceleration = (pressureForce + viscosityForce) / density;
+        mParticles[particleIndex].mVelocity += totalAcceleration * aDeltaTime.asSeconds();
     }
 }
 
@@ -148,6 +162,13 @@ float Physics::smoothingKernelDerivative(float aRadius, float aDistance)
     }
     float scale = 12 / (std::pow(aRadius, 4) * M_PI);
     return (aDistance - aRadius) * scale;
+}
+
+float Physics::viscosityKernel(float aRadius, float aDistance)
+{
+    float volume = (M_PI * std::pow(aRadius, 8)) / 4;
+    float value = std::max(0.0f, aRadius * aRadius - aDistance * aDistance);
+    return value * value * value / volume;
 }
 
 float Physics::calculateDensity(int aParticleIndex)
@@ -181,7 +202,7 @@ sf::Vector2f Physics::calculatePressureForce(int aParticleIndex)
 
     for (size_t neighborIndex : neighbors)
     {
-        if (neighborIndex == aParticleIndex)
+        if (&mParticles[neighborIndex] == &mParticles[aParticleIndex])
         {
             continue;
         }
@@ -216,4 +237,40 @@ float Physics::calculateSharedPressure(float aDensityA, float aDensityB)
     float pressureA = convertDensityToPressure(aDensityA);
     float pressureB = convertDensityToPressure(aDensityB);
     return (pressureA + pressureB) / 2;
+}
+
+sf::Vector2f Physics::calculateViscosityForce(int aParticleIndex)
+{
+    sf::Vector2f viscosityForce{0.0f, 0.0f};
+    sf::Vector2f position = mParticles[aParticleIndex].mPosition;
+    float smoothingRadius = SimulationConfig::getInstance().smoothingRadius();
+
+    std::vector<size_t> neighbors = mQuadTree.findNeighbors(mParticles[aParticleIndex], smoothingRadius);
+    for (size_t neighborIndex : neighbors)
+    {
+        if (&mParticles[neighborIndex] == &mParticles[aParticleIndex])
+        {
+            continue;
+        }
+
+        sf::Vector2f offset = mParticles[neighborIndex].mPosition - position;
+        float distance = std::hypot(offset.x, offset.y);
+        if (distance <= 0.0f)
+        {
+            continue; // Avoid division by zero
+        }
+        float influence = viscosityKernel(SimulationConfig::getInstance().smoothingRadius(), distance);
+        viscosityForce += (mParticles[neighborIndex].mVelocity - mParticles[aParticleIndex].mVelocity) * influence;
+    }
+
+    return viscosityForce * SimulationConfig::getInstance().viscosityMultiplier();
+}
+
+void Physics::predictPositions(sf::Time aDeltaTime)
+{
+    for (size_t i = 0; i < mParticles.size(); ++i)
+    {
+        Particle &particle = mParticles[i];
+        mPredictedPositions[i] = particle.mPosition + particle.mVelocity * 1.f / 120.f;
+    }
 }

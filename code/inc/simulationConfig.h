@@ -52,6 +52,15 @@ public:
     float gravity() const;
     void gravity(float aGravity);
 
+    bool isMousePressedLeft() const;
+    void isMousePressedLeft(bool aPressed);
+
+    bool isMousePressedRight() const;
+    void isMousePressedRight(bool aPressed);
+
+    sf::Vector2f mousePosition() const;
+    void mousePosition(const sf::Vector2f &aPosition);
+
     // Callback setters
     void setOnParticleCountChanged(const std::function<void()> &callback);
     void setOnParticleRadiusChanged(const std::function<void()> &callback);
@@ -74,9 +83,13 @@ private:
     float mPressureMultiplier;
     float mViscosityMultiplier;
     float mGravity;
+    bool mIsMousePressedLeft;
+    bool mIsMousePressedRight;
+    sf::Vector2f mMousePosition;
 
     // Callbacks
-    std::function<void()> onParticleCountChanged;
+    std::function<void()>
+        onParticleCountChanged;
     std::function<void()> onParticleRadiusChanged;
     std::function<void()> onParticleSpacingChanged;
 };

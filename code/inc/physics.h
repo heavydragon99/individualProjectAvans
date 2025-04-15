@@ -8,8 +8,7 @@
 #include <SFML/System/Clock.hpp>
 #include <vector>
 
-#define GRAVITY 9.8f
-#define COLLISION_DAMPING 1.0f
+#define COLLISION_DAMPING 0.8f
 
 extern "C"
 {
@@ -23,10 +22,9 @@ public:
 
     void initialize();
     void update(sf::Time aDeltaTime);
-    void applyMouseForce(const sf::Vector2f& aMousePosition, float aForceMagnitude);
 
 private:
-    void applyGravity(sf::Time aDeltaTime);
+    void externalForces(sf::Time aDeltaTime);
     void checkBoundary();
     void updateDensities();
     void updateForces(sf::Time aDeltaTime);
@@ -34,10 +32,13 @@ private:
 
     float smoothingKernel(float aRadius, float aDistance);
     float smoothingKernelDerivative(float aRadius, float aDistance);
+    float viscosityKernel(float aRadius, float aDistance);
     float calculateDensity(int aParticleIndex);
     sf::Vector2f calculatePressureForce(int aParticleIndex);
     float convertDensityToPressure(float aDensity);
     float calculateSharedPressure(float aDensityA, float aDensityB);
+    sf::Vector2f calculateViscosityForce(int aParticleIndex);
+    void predictPositions(sf::Time aDeltaTime);
 
 private:
     LinearQuadTree mQuadTree;

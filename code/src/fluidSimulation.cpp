@@ -51,18 +51,20 @@ void FluidSimulation::processEvents()
         }
         if (SimulationConfig::getInstance().simulationState() == SimulationState::RUNNING)
         {
-            // Calculate mouse coordinates
-            sf::Vector2f mousePos = mRenderer.getWindow().mapPixelToCoords({sf::Mouse::getPosition(mRenderer.getWindow()).x, sf::Mouse::getPosition(mRenderer.getWindow()).y});
-            //Scale mousePos to the game size
+            SimulationConfig::getInstance().isMousePressedLeft(false);
+            SimulationConfig::getInstance().isMousePressedRight(false);
+            sf::Vector2f mousePos = mRenderer.getWindow().mapPixelToCoords(sf::Mouse::getPosition(mRenderer.getWindow()));
+            // Scale mousePos to the game size
             mousePos.x = (mousePos.x / mRenderer.getWindow().getSize().x) * SimulationConfig::getInstance().gameSize().x;
             mousePos.y = (mousePos.y / mRenderer.getWindow().getSize().y) * SimulationConfig::getInstance().gameSize().y;
+            SimulationConfig::getInstance().mousePosition(mousePos);
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
             {
-                mParticleSystem.applyMouseForce({mousePos.x,mousePos.y}, -1.f * SimulationConfig::getInstance().pressureMultiplier());
+                SimulationConfig::getInstance().isMousePressedLeft(true);
             }
             else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
             {
-                mParticleSystem.applyMouseForce({mousePos.x, mousePos.y}, 1.f * SimulationConfig::getInstance().pressureMultiplier());
+                SimulationConfig::getInstance().isMousePressedRight(true);
             }
         }
     }

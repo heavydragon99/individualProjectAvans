@@ -85,8 +85,3 @@ void ParticleSystem::spawnParticles()
         mParticles.emplace_back(sf::Vector2f(x, y), sf::Vector2f(0.f, 0.f), particleRadius);
     }
 }
-
-void ParticleSystem::applyMouseForce(const sf::Vector2f &aMousePosition, float aForceMagnitude)
-{
-    mPhysicsEngine->applyMouseForce(aMousePosition, aForceMagnitude);
-}

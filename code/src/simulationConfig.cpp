@@ -7,7 +7,7 @@ SimulationConfig &SimulationConfig::getInstance()
 }
 
 SimulationConfig::SimulationConfig()
-    : mSimulationState(SimulationState::SETUP), mParticleCount(2500), mParticleRadius(2.f), mParticleSpacing(5), mGameSize({640, 360}), mWindowSize({1920, 1080}), mSmoothingRadius(10), mTargetDensity(5), mPressureMultiplier(10), mViscosityMultiplier(0.4), mGravity(9.81) {}
+    : mSimulationState(SimulationState::SETUP), mParticleCount(2500), mParticleRadius(2.f), mParticleSpacing(5), mGameSize({640, 360}), mWindowSize({1920, 1080}), mSmoothingRadius(10), mTargetDensity(5), mPressureMultiplier(10), mViscosityMultiplier(0.2), mGravity(9.81), mIsMousePressedLeft(false), mIsMousePressedRight(false), mMousePosition{0.0f, 0.0f} {}
 
 SimulationState SimulationConfig::simulationState() const { return mSimulationState; }
 void SimulationConfig::simulationState(SimulationState aState) { mSimulationState = aState; }
@@ -62,6 +62,15 @@ void SimulationConfig::viscosityMultiplier(float aMultiplier) { mViscosityMultip
 
 float SimulationConfig::gravity() const { return mGravity; }
 void SimulationConfig::gravity(float aGravity) { mGravity = aGravity; }
+
+bool SimulationConfig::isMousePressedLeft() const { return mIsMousePressedLeft; }
+void SimulationConfig::isMousePressedLeft(bool aPressed) { mIsMousePressedLeft = aPressed; }
+
+bool SimulationConfig::isMousePressedRight() const { return mIsMousePressedRight; }
+void SimulationConfig::isMousePressedRight(bool aPressed) { mIsMousePressedRight = aPressed; }
+
+sf::Vector2f SimulationConfig::mousePosition() const { return mMousePosition; }
+void SimulationConfig::mousePosition(const sf::Vector2f &aPosition) { mMousePosition = aPosition; }
 
 void SimulationConfig::setOnParticleCountChanged(const std::function<void()> &callback) { onParticleCountChanged = callback; }
 void SimulationConfig::setOnParticleRadiusChanged(const std::function<void()> &callback) { onParticleRadiusChanged = callback; }
