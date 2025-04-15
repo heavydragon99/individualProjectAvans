@@ -51,13 +51,18 @@ void FluidSimulation::processEvents()
         }
         if (SimulationConfig::getInstance().simulationState() == SimulationState::RUNNING)
         {
+            // Calculate mouse coordinates
+            sf::Vector2f mousePos = mRenderer.getWindow().mapPixelToCoords({sf::Mouse::getPosition(mRenderer.getWindow()).x, sf::Mouse::getPosition(mRenderer.getWindow()).y});
+            //Scale mousePos to the game size
+            mousePos.x = (mousePos.x / mRenderer.getWindow().getSize().x) * SimulationConfig::getInstance().gameSize().x;
+            mousePos.y = (mousePos.y / mRenderer.getWindow().getSize().y) * SimulationConfig::getInstance().gameSize().y;
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
             {
-                mParticleSystem.applyMouseForce(mRenderer.getWindow().mapPixelToCoords({sf::Mouse::getPosition(mRenderer.getWindow()).x, sf::Mouse::getPosition(mRenderer.getWindow()).y}), -10.f);
+                mParticleSystem.applyMouseForce({mousePos.x,mousePos.y}, -10.f);
             }
             else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
             {
-                mParticleSystem.applyMouseForce(mRenderer.getWindow().mapPixelToCoords({sf::Mouse::getPosition(mRenderer.getWindow()).x, sf::Mouse::getPosition(mRenderer.getWindow()).y}), 10.f);
+                mParticleSystem.applyMouseForce({mousePos.x, mousePos.y}, 10.f);
             }
         }
     }
