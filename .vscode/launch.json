@@ -12,7 +12,7 @@
 
       "args": [],
       "stopAtEntry": false,
-      "cwd": "${workspaceFolder}",
+      "cwd": "${workspaceFolder}/code/build",
       "environment": [],
       "externalConsole": false,
       "MIMode": "gdb",

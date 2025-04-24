@@ -6,15 +6,7 @@
 #include <algorithm>
 #include <random>
 
-extern "C"
-{
-    double calculatePosition(double initialPosition, double initialVelocity, double time, double acceleration)
-    {
-        return initialPosition + initialVelocity * time + 0.5 * acceleration * time * time;
-    }
-}
-
-Physics::Physics(std::vector<Particle> &aParticles) : mParticles(aParticles), mQuadTree(aParticles) {}
+Physics::Physics(std::vector<Particle> &aParticles) : mParticles(aParticles), mQuadTree(aParticles), mCLCompute(aParticles) {}
 
 void Physics::initialize()
 {
@@ -30,7 +22,8 @@ void Physics::update(sf::Time aDeltaTime)
     externalForces(aDeltaTime);
     updateDensities();
     updateForces(aDeltaTime);
-    updatePositions(aDeltaTime);
+    // updatePositions(aDeltaTime);
+    mCLCompute.updatePositionsGPU(aDeltaTime.asSeconds());
     checkBoundary();
 }
 

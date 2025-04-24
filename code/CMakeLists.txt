@@ -25,6 +25,7 @@ set(SOURCES
     ${PROJECT_SOURCE_DIR}/src/fluidSimulation.cpp
     ${PROJECT_SOURCE_DIR}/src/linearQuadTree.cpp
     ${PROJECT_SOURCE_DIR}/src/main.cpp
+    ${PROJECT_SOURCE_DIR}/src/openCLCompute.cpp
     ${PROJECT_SOURCE_DIR}/src/particleSystem.cpp
     ${PROJECT_SOURCE_DIR}/src/physics.cpp
     ${PROJECT_SOURCE_DIR}/src/renderer.cpp
@@ -52,6 +53,10 @@ set(LIBRARIES
     sfml-window
     ImGui-SFML::ImGui-SFML
 )
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/kernels/updatePositions.cl
+               ${CMAKE_CURRENT_BINARY_DIR}/updatePositions.cl
+               COPYONLY)
 
 # Link the libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBRARIES})

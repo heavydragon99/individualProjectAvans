@@ -3,17 +3,13 @@
 
 #include "particle.h"
 #include "linearQuadTree.h"
+#include "openCLCompute.h"
 
 #include <SFML/System/Vector2.hpp>
 #include <SFML/System/Clock.hpp>
 #include <vector>
 
 #define COLLISION_DAMPING 0.8f
-
-extern "C"
-{
-    double calculatePosition(double initialPosition, double initialVelocity, double time, double acceleration);
-}
 
 class Physics
 {
@@ -45,6 +41,7 @@ private:
     std::vector<Particle> &mParticles;
     std::vector<float> mDensities;
     std::vector<sf::Vector2f> mPredictedPositions;
+    OpenCLCompute mCLCompute;
 };
 
 #endif // PHYSICS_H
