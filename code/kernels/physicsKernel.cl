@@ -1,5 +1,6 @@
 // #define M_PI 3.14159265358979323846f
 #define MASS 1.0f
+#define COLLISION_DAMPING 0.8f
 
 static float smoothingKernel(float aRadius, float aDistance)
 {
@@ -66,7 +67,10 @@ __kernel void integrate(
     const float aPressureMultiplier,
     const float aViscosityMultiplier,
     const float aGravity,
-    const float aSmoothingRadius)
+    const float aSmoothingRadius,
+    const float aParticleRadius,
+    const float aGameHeight,
+    const float aGameWidth)
 {
     int particleIndex = get_global_id(0);
     float2 positionParticle = aPositions[particleIndex];
@@ -77,7 +81,7 @@ __kernel void integrate(
     // Compute pressure
     float pressureParticle = aPressureMultiplier * (densityParticle - aTargetDensity);
 
-    float2 accel = (float2)(0.0f, aGravity);
+    float2 accel = (float2)(0.0f, 0.0f);
     float2 pressureForce = (float2)(0.0f, 0.0f);
     float2 viscosityForce = (float2)(0.0f, 0.0f);
 
@@ -101,20 +105,46 @@ __kernel void integrate(
         float sharedPressure = 0.5f * (pressureParticle + pressureOther);
         float gradient = smoothingKernelDerivative(aSmoothingRadius, distance);
         float2 dir = (float2)(dx / distance, dy / distance);
-        pressureForce += -sharedPressure * dir * gradient * MASS / densityOther;
+        pressureForce -= sharedPressure * dir * gradient * MASS / densityOther;
 
         // Viscosity
         float2 velocityOtherParticle = aVelocities[otherparticleIndex];
         float influence = viscosityKernel(aSmoothingRadius, distance);
-        viscosityForce += (velocityOtherParticle - velocityParticle) * influence * aViscosityMultiplier;
+        // viscosityForce += (velocityOtherParticle - velocityParticle) * influence * aViscosityMultiplier;
     }
 
+
     float2 totalPressure = (pressureForce + viscosityForce) / densityParticle;
+    totalPressure += (float2)(0.0f, aGravity);
 
     // Integrate
     velocityParticle += totalPressure * aDeltaTime;
     positionParticle += velocityParticle * aDeltaTime;
 
+    // Boundary conditions
+    if (positionParticle.x < aParticleRadius)
+    {
+        positionParticle.x = aParticleRadius;
+        velocityParticle.x *= -COLLISION_DAMPING;
+    }
+    else if (positionParticle.x > aGameWidth - aParticleRadius)
+    {
+        positionParticle.x = aGameWidth - aParticleRadius;
+        velocityParticle.x *= -COLLISION_DAMPING;
+    }
+    if (positionParticle.y < aParticleRadius)
+    {
+        positionParticle.y = aParticleRadius;
+        velocityParticle.y *= -COLLISION_DAMPING;
+    }
+    else if (positionParticle.y > aGameHeight - aParticleRadius)
+    {
+        positionParticle.y = aGameHeight - aParticleRadius;
+        velocityParticle.y *= -COLLISION_DAMPING;
+    }
+
+
+    // Update positions and velocities
     aVelocities[particleIndex] = velocityParticle;
     aPositions[particleIndex] = positionParticle;
 }

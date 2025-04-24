@@ -23,9 +23,9 @@ void PhysicsGPU::initialize()
 void PhysicsGPU::update(float dt)
 {
     cl_int err;
-        // Upload host data to GPU
-        std::vector<cl_float2>
-            positions(mCount), velocities(mCount);
+    // Upload host data to GPU
+    std::vector<cl_float2>
+        positions(mCount), velocities(mCount);
     for (size_t i = 0; i < mCount; ++i)
     {
         positions[i] = {mParticles[i].mPosition.x, mParticles[i].mPosition.y};
@@ -66,6 +66,9 @@ void PhysicsGPU::update(float dt)
     mKernelIntegrate.setArg(7, (float)SimulationConfig::getInstance().viscosityMultiplier());
     mKernelIntegrate.setArg(8, (float)SimulationConfig::getInstance().gravity());
     mKernelIntegrate.setArg(9, (float)SimulationConfig::getInstance().smoothingRadius());
+    mKernelIntegrate.setArg(10, (float)mParticles[0].mRadius);
+    mKernelIntegrate.setArg(11, (float)SimulationConfig::getInstance().gameSize().y);
+    mKernelIntegrate.setArg(12, (float)SimulationConfig::getInstance().gameSize().x);
     err = mQueue.enqueueNDRangeKernel(mKernelIntegrate, cl::NullRange, cl::NDRange(mCount), cl::NullRange);
     if (err != CL_SUCCESS)
     {
@@ -84,32 +87,6 @@ void PhysicsGPU::update(float dt)
         mParticles[i].mPosition.y = positions[i].s[1];
         mParticles[i].mVelocity.x = velocities[i].s[0];
         mParticles[i].mVelocity.y = velocities[i].s[1];
-    }
-
-    // Boundary check (host-side)
-    const auto &size = SimulationConfig::getInstance().gameSize();
-    for (auto &p : mParticles)
-    {
-        if (p.mPosition.x < p.mRadius)
-        {
-            p.mPosition.x = p.mRadius;
-            p.mVelocity.x *= -COLLISION_DAMPING;
-        }
-        if (p.mPosition.x > size.x - p.mRadius)
-        {
-            p.mPosition.x = size.x - p.mRadius;
-            p.mVelocity.x *= -COLLISION_DAMPING;
-        }
-        if (p.mPosition.y < p.mRadius)
-        {
-            p.mPosition.y = p.mRadius;
-            p.mVelocity.y *= -COLLISION_DAMPING;
-        }
-        if (p.mPosition.y > size.y - p.mRadius)
-        {
-            p.mPosition.y = size.y - p.mRadius;
-            p.mVelocity.y *= -COLLISION_DAMPING;
-        }
     }
 }
 
