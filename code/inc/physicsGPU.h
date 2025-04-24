@@ -29,11 +29,13 @@ private:
 
     cl::Kernel mKernelComputeDensity;
     cl::Kernel mKernelIntegrate;
+    cl::Kernel mKernelPredictPositions;
 
     cl::Buffer mBufPositions;
     cl::Buffer mBufVelocities;
     cl::Buffer mBufDensities;
     cl::Buffer mBufForces;
+    cl::Buffer mBufPredictedPositions;
 
     std::vector<Particle> &mParticles;
     size_t mCount;

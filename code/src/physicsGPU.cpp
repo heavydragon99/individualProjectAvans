@@ -17,12 +17,15 @@ void PhysicsGPU::initialize()
     mBufVelocities = cl::Buffer(mContext, CL_MEM_READ_WRITE, sizeof(cl_float2) * mCount);
     mBufDensities = cl::Buffer(mContext, CL_MEM_READ_WRITE, sizeof(float) * mCount);
     mBufForces = cl::Buffer(mContext, CL_MEM_READ_WRITE, sizeof(cl_float2) * mCount);
+    mBufPredictedPositions = cl::Buffer(mContext, CL_MEM_READ_WRITE, sizeof(cl_float2) * mCount);
 }
 
 void PhysicsGPU::update(float dt)
 {
-    // 1) Upload host data to GPU
-    std::vector<cl_float2> positions(mCount), velocities(mCount);
+    cl_int err;
+        // Upload host data to GPU
+        std::vector<cl_float2>
+            positions(mCount), velocities(mCount);
     for (size_t i = 0; i < mCount; ++i)
     {
         positions[i] = {mParticles[i].mPosition.x, mParticles[i].mPosition.y};
@@ -31,27 +34,38 @@ void PhysicsGPU::update(float dt)
     mQueue.enqueueWriteBuffer(mBufPositions, CL_TRUE, 0, sizeof(cl_float2) * mCount, positions.data());
     mQueue.enqueueWriteBuffer(mBufVelocities, CL_TRUE, 0, sizeof(cl_float2) * mCount, velocities.data());
 
-    // 2) Compute densities
-    mKernelComputeDensity.setArg(0, mBufPositions);
+    // Predict positions
+    mKernelPredictPositions.setArg(0, mBufPositions);
+    mKernelPredictPositions.setArg(1, mBufVelocities);
+    mKernelPredictPositions.setArg(2, mBufPredictedPositions);
+    err = mQueue.enqueueNDRangeKernel(mKernelPredictPositions, cl::NullRange, cl::NDRange(mCount), cl::NullRange);
+    if (err != CL_SUCCESS)
+    {
+        std::cerr << "Kernel launch failed (predictPositions): " << err << std::endl;
+    }
+
+    // Compute densities
+    mKernelComputeDensity.setArg(0, mBufPredictedPositions);
     mKernelComputeDensity.setArg(1, mBufDensities);
     mKernelComputeDensity.setArg(2, (int)mCount);
     mKernelComputeDensity.setArg(3, SimulationConfig::getInstance().smoothingRadius());
-    cl_int err = mQueue.enqueueNDRangeKernel(mKernelComputeDensity, cl::NullRange, cl::NDRange(mCount), cl::NullRange);
+    err = mQueue.enqueueNDRangeKernel(mKernelComputeDensity, cl::NullRange, cl::NDRange(mCount), cl::NullRange);
     if (err != CL_SUCCESS)
     {
         std::cerr << "Kernel launch failed (computeDensity): " << err << std::endl;
     }
 
-    // 3) Integrate forces & positions
+    // Integrate forces & positions
     mKernelIntegrate.setArg(0, mBufPositions);
     mKernelIntegrate.setArg(1, mBufVelocities);
-    mKernelIntegrate.setArg(2, mBufDensities);
-    mKernelIntegrate.setArg(3, (float)dt);
-    mKernelIntegrate.setArg(4, (float)SimulationConfig::getInstance().targetDensity());
-    mKernelIntegrate.setArg(5, (float)SimulationConfig::getInstance().pressureMultiplier());
-    mKernelIntegrate.setArg(6, (float)SimulationConfig::getInstance().viscosityMultiplier());
-    mKernelIntegrate.setArg(7, (float)SimulationConfig::getInstance().gravity());
-    mKernelIntegrate.setArg(8, (float)SimulationConfig::getInstance().smoothingRadius());
+    mKernelIntegrate.setArg(2, mBufPredictedPositions);
+    mKernelIntegrate.setArg(3, mBufDensities);
+    mKernelIntegrate.setArg(4, (float)dt);
+    mKernelIntegrate.setArg(5, (float)SimulationConfig::getInstance().targetDensity());
+    mKernelIntegrate.setArg(6, (float)SimulationConfig::getInstance().pressureMultiplier());
+    mKernelIntegrate.setArg(7, (float)SimulationConfig::getInstance().viscosityMultiplier());
+    mKernelIntegrate.setArg(8, (float)SimulationConfig::getInstance().gravity());
+    mKernelIntegrate.setArg(9, (float)SimulationConfig::getInstance().smoothingRadius());
     err = mQueue.enqueueNDRangeKernel(mKernelIntegrate, cl::NullRange, cl::NDRange(mCount), cl::NullRange);
     if (err != CL_SUCCESS)
     {
@@ -60,7 +74,7 @@ void PhysicsGPU::update(float dt)
 
     mQueue.finish();
 
-    // 4) Download positions & velocities
+    // Download positions & velocities
     mQueue.enqueueReadBuffer(mBufPositions, CL_TRUE, 0, sizeof(cl_float2) * mCount, positions.data());
     mQueue.enqueueReadBuffer(mBufVelocities, CL_TRUE, 0, sizeof(cl_float2) * mCount, velocities.data());
 
@@ -72,7 +86,7 @@ void PhysicsGPU::update(float dt)
         mParticles[i].mVelocity.y = velocities[i].s[1];
     }
 
-    // 5) Boundary check (host-side)
+    // Boundary check (host-side)
     const auto &size = SimulationConfig::getInstance().gameSize();
     for (auto &p : mParticles)
     {
@@ -127,6 +141,7 @@ void PhysicsGPU::setupOpenCL()
     // Create kernels
     mKernelComputeDensity = cl::Kernel(mProgram, "computeDensity");
     mKernelIntegrate = cl::Kernel(mProgram, "integrate");
+    mKernelPredictPositions = cl::Kernel(mProgram, "predictPositions");
 }
 
 std::string PhysicsGPU::loadKernelSource(const std::string &path)

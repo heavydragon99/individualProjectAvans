@@ -20,19 +20,31 @@ static float viscosityKernel(float smoothingRadius, float distance) {
     return (val*val*val) / vol;
 }
 
+__kernel void predictPositions(
+    __global const float2 *positions,
+    __global const float2 *velocities,
+    __global float2 *predictedPositions)
+{
+    int i = get_global_id(0);
+    float2 positionParticle = positions[i];
+    float2 velocityParticle = velocities[i];
+    predictedPositions[i] = positionParticle + velocityParticle * 0.16666667f; // position + velocity * 1/60
+}
+
+
 __kernel void computeDensity(
-    __global const float2* positions,
+    __global const float2* predictedPositions,
     __global float* densities,
     const int n,
     const float smoothingRadius)
 {
     int i = get_global_id(0);
-    float2 positionParticle = positions[i];
+    float2 positionParticle = predictedPositions[i];
     float rho = 0.0f;
     for (int j = 0; j < n; ++j) {
-        float2 positionOtherParticle = positions[j];
-        float dx = positionOtherParticle.x - positionParticle.x;
-        float dy = positionOtherParticle.y - positionParticle.y;
+        float2 PredictedPositionOtherParticle = predictedPositions[j];
+        float dx = PredictedPositionOtherParticle.x - positionParticle.x;
+        float dy = PredictedPositionOtherParticle.y - positionParticle.y;
         float distance = sqrt(dx*dx + dy*dy);
         rho += MASS * smoothingKernel(smoothingRadius, distance);
     }
@@ -42,6 +54,7 @@ __kernel void computeDensity(
 __kernel void integrate(
     __global float2* positions,
     __global float2* velocities,
+    __global const float2* predictedPositions,
     __global const float* densities,
     const float dt,
     const float targetDensity,
@@ -54,6 +67,7 @@ __kernel void integrate(
     float2 positionParticle = positions[i];
     float2 velocityParticle = velocities[i];
     float densityParticle = densities[i];
+    float2 predictedPositionParticle = predictedPositions[i];
     
     // Compute pressure
     float pressure_i = pressureMultiplier * (densityParticle - targetDensity);
@@ -63,9 +77,9 @@ __kernel void integrate(
     // Interaction forces
     for (int j = 0; j < get_global_size(0); ++j) {
         if (j == i) continue;
-        float2 positionOtherParticle = positions[j];
-        float dx = positionOtherParticle.x - positionParticle.x;
-        float dy = positionOtherParticle.y - positionParticle.y;
+        float2 PredictedPositionOtherParticle = predictedPositions[j];
+        float dx = PredictedPositionOtherParticle.x - predictedPositionParticle.x;
+        float dy = PredictedPositionOtherParticle.y - predictedPositionParticle.y;
         float distance = sqrt(dx*dx + dy*dy);
         if (distance <= 0.0f || distance > smoothingRadius) continue;
 
