@@ -31,6 +31,12 @@ void SimulationGUI::renderControlsSetup()
         config.simulationState(SimulationState::INITIALIZING);
     }
 
+    // Use GPU checkbox
+    bool useGPU = config.useGPU();
+    if (ImGui::Checkbox("Use GPU", &useGPU)) {
+        config.useGPU(useGPU);
+    }
+
     // Particle count
     unsigned int count = config.particleCount();
     if (ImGui::InputInt("Particle Count", (int *)&count)) {

@@ -7,6 +7,7 @@
 
 #include "particle.h"
 #include "physics.h"
+#include "physicsGPU.h"
 
 class ParticleSystem
 {
@@ -26,6 +27,7 @@ private:
 
     std::vector<Particle> mParticles;
     std::unique_ptr<Physics> mPhysicsEngine;
+    std::unique_ptr<PhysicsGPU> mPhysicsEngineGPU;
 };
 
 #endif // PARTICLE_SYSTEM_H

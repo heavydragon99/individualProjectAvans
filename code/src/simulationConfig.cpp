@@ -7,7 +7,7 @@ SimulationConfig &SimulationConfig::getInstance()
 }
 
 SimulationConfig::SimulationConfig()
-    : mSimulationState(SimulationState::SETUP), mParticleCount(1200), mParticleRadius(2.f), mParticleSpacing(8), mGameSize({640, 360}), mWindowSize({1920, 1080}), mSmoothingRadius(10), mTargetDensity(40), mPressureMultiplier(1), mViscosityMultiplier(0.2), mGravity(9.81), mIsMousePressedLeft(false), mIsMousePressedRight(false), mMousePosition{0.0f, 0.0f} {}
+    : mSimulationState(SimulationState::SETUP), mParticleCount(1200), mParticleRadius(2.f), mParticleSpacing(8), mGameSize({640, 360}), mWindowSize({1920, 1080}), mSmoothingRadius(10), mTargetDensity(40), mPressureMultiplier(1), mViscosityMultiplier(0.2), mGravity(9.81), mIsMousePressedLeft(false), mIsMousePressedRight(false), mMousePosition{0.0f, 0.0f}, mUseGPU(true) {}
 
 SimulationState SimulationConfig::simulationState() const { return mSimulationState; }
 void SimulationConfig::simulationState(SimulationState aState) { mSimulationState = aState; }
@@ -71,6 +71,9 @@ void SimulationConfig::isMousePressedRight(bool aPressed) { mIsMousePressedRight
 
 sf::Vector2f SimulationConfig::mousePosition() const { return mMousePosition; }
 void SimulationConfig::mousePosition(const sf::Vector2f &aPosition) { mMousePosition = aPosition; }
+
+bool SimulationConfig::useGPU() const { return mUseGPU; }
+void SimulationConfig::useGPU(bool aUseGPU) { mUseGPU = aUseGPU; }
 
 void SimulationConfig::setOnParticleCountChanged(const std::function<void()> &callback) { onParticleCountChanged = callback; }
 void SimulationConfig::setOnParticleRadiusChanged(const std::function<void()> &callback) { onParticleRadiusChanged = callback; }

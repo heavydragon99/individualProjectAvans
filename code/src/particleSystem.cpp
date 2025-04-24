@@ -8,6 +8,7 @@
 ParticleSystem::ParticleSystem()
 {
     mPhysicsEngine = std::make_unique<Physics>(mParticles);
+    mPhysicsEngineGPU = std::make_unique<PhysicsGPU>(mParticles);
 
     // Register callbacks
     SimulationConfig &config = SimulationConfig::getInstance();
@@ -23,12 +24,26 @@ ParticleSystem::ParticleSystem()
 void ParticleSystem::initialize()
 {
     reset();
-    mPhysicsEngine->initialize();
+    if(SimulationConfig::getInstance().useGPU())
+    {
+        mPhysicsEngineGPU->initialize();
+    }
+    else
+    {
+        mPhysicsEngine->initialize();
+    }
 }
 
 void ParticleSystem::update(sf::Time aDeltaTime)
 {
-    mPhysicsEngine->update(aDeltaTime);
+    if(SimulationConfig::getInstance().useGPU())
+    {
+        mPhysicsEngineGPU->update(aDeltaTime.asSeconds());
+    }
+    else
+    {
+        mPhysicsEngine->update(aDeltaTime);
+    }
 }
 
 void ParticleSystem::reset()

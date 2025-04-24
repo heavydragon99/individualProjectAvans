@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <random>
 
-Physics::Physics(std::vector<Particle> &aParticles) : mParticles(aParticles), mQuadTree(aParticles), mCLCompute(aParticles) {}
+Physics::Physics(std::vector<Particle> &aParticles) : mParticles(aParticles), mQuadTree(aParticles) {}
 
 void Physics::initialize()
 {
@@ -22,8 +22,7 @@ void Physics::update(sf::Time aDeltaTime)
     externalForces(aDeltaTime);
     updateDensities();
     updateForces(aDeltaTime);
-    // updatePositions(aDeltaTime);
-    mCLCompute.updatePositionsGPU(aDeltaTime.asSeconds());
+    updatePositions(aDeltaTime);
     checkBoundary();
 }
 

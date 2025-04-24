@@ -61,6 +61,9 @@ public:
     sf::Vector2f mousePosition() const;
     void mousePosition(const sf::Vector2f &aPosition);
 
+    bool useGPU() const;
+    void useGPU(bool aUseGPU);
+
     // Callback setters
     void setOnParticleCountChanged(const std::function<void()> &callback);
     void setOnParticleRadiusChanged(const std::function<void()> &callback);
@@ -86,6 +89,7 @@ private:
     bool mIsMousePressedLeft;
     bool mIsMousePressedRight;
     sf::Vector2f mMousePosition;
+    bool mUseGPU;
 
     // Callbacks
     std::function<void()>
