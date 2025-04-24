@@ -237,7 +237,7 @@ float Physics::calculateSharedPressure(float aDensityA, float aDensityB)
 sf::Vector2f Physics::calculateViscosityForce(int aParticleIndex)
 {
     sf::Vector2f viscosityForce{0.0f, 0.0f};
-    sf::Vector2f position = mParticles[aParticleIndex].mPosition;
+    sf::Vector2f position = mPredictedPositions[aParticleIndex];
     float smoothingRadius = SimulationConfig::getInstance().smoothingRadius();
 
     std::vector<size_t> neighbors = mQuadTree.findNeighbors(mParticles[aParticleIndex], smoothingRadius);
@@ -248,7 +248,7 @@ sf::Vector2f Physics::calculateViscosityForce(int aParticleIndex)
             continue;
         }
 
-        sf::Vector2f offset = mParticles[neighborIndex].mPosition - position;
+        sf::Vector2f offset = mPredictedPositions[aParticleIndex] - position;
         float distance = std::hypot(offset.x, offset.y);
         if (distance <= 0.0f)
         {
