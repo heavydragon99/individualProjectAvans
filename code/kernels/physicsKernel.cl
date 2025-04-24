@@ -1,106 +1,120 @@
-//#define M_PI 3.14159265358979323846f
+// #define M_PI 3.14159265358979323846f
 #define MASS 1.0f
 
-static float smoothingKernel(float smoothingRadius, float distance) {
-    if (distance >= smoothingRadius) return 0.0f;
-    float vol = (M_PI * smoothingRadius*smoothingRadius*smoothingRadius*smoothingRadius) * 0.16666667f; // πh^4/6
-    float x = (smoothingRadius - distance);
-    return (x*x) / vol;
+static float smoothingKernel(float aRadius, float aDistance)
+{
+    if (aDistance >= aRadius)
+        return 0.0f;
+    float vol = (M_PI * aRadius * aRadius * aRadius * aRadius) * 0.16666667f; // πh^4/6
+    float x = (aRadius - aDistance);
+    return (x * x) / vol;
 }
 
-static float smoothingKernelDerivative(float smoothingRadius, float distance) {
-    if (distance >= smoothingRadius) return 0.0f;
-    float scale = 12.0f / (M_PI * smoothingRadius*smoothingRadius*smoothingRadius*smoothingRadius);
-    return (distance - smoothingRadius) * scale;
+static float smoothingKernelDerivative(float aRadius, float aDistance)
+{
+    if (aDistance >= aRadius)
+        return 0.0f;
+    float scale = 12.0f / (M_PI * aRadius * aRadius * aRadius * aRadius);
+    return (aDistance - aRadius) * scale;
 }
 
-static float viscosityKernel(float smoothingRadius, float distance) {
-    float vol = (M_PI * smoothingRadius*smoothingRadius*smoothingRadius*smoothingRadius*smoothingRadius*smoothingRadius*smoothingRadius*smoothingRadius) * 0.25f; // πh^8/4
-    float val = fmax(0.0f, smoothingRadius*smoothingRadius - distance*distance);
-    return (val*val*val) / vol;
+static float viscosityKernel(float aRadius, float aDistance)
+{
+    float vol = (M_PI * aRadius * aRadius * aRadius * aRadius * aRadius * aRadius * aRadius * aRadius) * 0.25f; // πh^8/4
+    float val = fmax(0.0f, aRadius * aRadius - aDistance * aDistance);
+    return (val * val * val) / vol;
 }
 
 __kernel void predictPositions(
-    __global const float2 *positions,
-    __global const float2 *velocities,
-    __global float2 *predictedPositions)
+    __global const float2 *aPositions,
+    __global const float2 *aVelocities,
+    __global float2 *aPredictedPositions)
 {
-    int i = get_global_id(0);
-    float2 positionParticle = positions[i];
-    float2 velocityParticle = velocities[i];
-    predictedPositions[i] = positionParticle + velocityParticle * 0.16666667f; // position + velocity * 1/60
+    int particleIndex = get_global_id(0);
+    float2 positionParticle = aPositions[particleIndex];
+    float2 velocityParticle = aVelocities[particleIndex];
+    aPredictedPositions[particleIndex] = positionParticle + velocityParticle * 0.16666667f; // position + velocity * 1/60
 }
 
-
 __kernel void computeDensity(
-    __global const float2* predictedPositions,
-    __global float* densities,
-    const int n,
-    const float smoothingRadius)
+    __global const float2 *aPredictedPositions,
+    __global float *aDensities,
+    const int aParticleCount,
+    const float aSmoothingRadius)
 {
-    int i = get_global_id(0);
-    float2 positionParticle = predictedPositions[i];
-    float rho = 0.0f;
-    for (int j = 0; j < n; ++j) {
-        float2 PredictedPositionOtherParticle = predictedPositions[j];
+    int particleIndex = get_global_id(0);
+    float2 positionParticle = aPredictedPositions[particleIndex];
+    float density = 0.0f;
+    for (int otherparticleIndex = 0; otherparticleIndex < aParticleCount; ++otherparticleIndex)
+    {
+        float2 PredictedPositionOtherParticle = aPredictedPositions[otherparticleIndex];
         float dx = PredictedPositionOtherParticle.x - positionParticle.x;
         float dy = PredictedPositionOtherParticle.y - positionParticle.y;
-        float distance = sqrt(dx*dx + dy*dy);
-        rho += MASS * smoothingKernel(smoothingRadius, distance);
+        float distance = sqrt(dx * dx + dy * dy);
+        density += MASS * smoothingKernel(aSmoothingRadius, distance);
     }
-    densities[i] = rho;
+    aDensities[particleIndex] = density;
 }
 
 __kernel void integrate(
-    __global float2* positions,
-    __global float2* velocities,
-    __global const float2* predictedPositions,
-    __global const float* densities,
-    const float dt,
-    const float targetDensity,
-    const float pressureMultiplier,
-    const float viscosityMultiplier,
-    const float gravity,
-    const float smoothingRadius)
+    __global float2 *aPositions,
+    __global float2 *aVelocities,
+    __global const float2 *aPredictedPositions,
+    __global const float *aDensities,
+    const float aDeltaTime,
+    const float aTargetDensity,
+    const float aPressureMultiplier,
+    const float aViscosityMultiplier,
+    const float aGravity,
+    const float aSmoothingRadius)
 {
-    int i = get_global_id(0);
-    float2 positionParticle = positions[i];
-    float2 velocityParticle = velocities[i];
-    float densityParticle = densities[i];
-    float2 predictedPositionParticle = predictedPositions[i];
-    
-    // Compute pressure
-    float pressure_i = pressureMultiplier * (densityParticle - targetDensity);
+    int particleIndex = get_global_id(0);
+    float2 positionParticle = aPositions[particleIndex];
+    float2 velocityParticle = aVelocities[particleIndex];
+    float densityParticle = aDensities[particleIndex];
+    float2 predictedPositionParticle = aPredictedPositions[particleIndex];
 
-    float2 accel = (float2)(0.0f, gravity);
-    
+    // Compute pressure
+    float pressureParticle = aPressureMultiplier * (densityParticle - aTargetDensity);
+
+    float2 accel = (float2)(0.0f, aGravity);
+    float2 pressureForce = (float2)(0.0f, 0.0f);
+    float2 viscosityForce = (float2)(0.0f, 0.0f);
+
     // Interaction forces
-    for (int j = 0; j < get_global_size(0); ++j) {
-        if (j == i) continue;
-        float2 PredictedPositionOtherParticle = predictedPositions[j];
+    for (int otherparticleIndex = 0; otherparticleIndex < get_global_size(0); ++otherparticleIndex)
+    {
+        if (otherparticleIndex == particleIndex)
+            continue;
+        float2 PredictedPositionOtherParticle = aPredictedPositions[otherparticleIndex];
         float dx = PredictedPositionOtherParticle.x - predictedPositionParticle.x;
         float dy = PredictedPositionOtherParticle.y - predictedPositionParticle.y;
-        float distance = sqrt(dx*dx + dy*dy);
-        if (distance <= 0.0f || distance > smoothingRadius) continue;
+        float distance = sqrt(dx * dx + dy * dy);
+        if (distance <= 0.0f || distance > aSmoothingRadius)
+            continue;
 
         // Pressure force
-        float rho_j = densities[j];
-        float pressure_j = pressureMultiplier * (rho_j - targetDensity);
-        float sharedP = 0.5f * (pressure_i + pressure_j);
-        float grad = smoothingKernelDerivative(smoothingRadius, distance);
-        float2 dir = (float2)(dx/distance, dy/distance);
-        accel -= dir * (sharedP / rho_j) * grad;
+        float densityOther = aDensities[otherparticleIndex];
+        if (densityOther <= 0.0f)
+            continue; // Skip if density is zero or negative.
+        float pressureOther = aPressureMultiplier * (densityOther - aTargetDensity);
+        float sharedPressure = 0.5f * (pressureParticle + pressureOther);
+        float gradient = smoothingKernelDerivative(aSmoothingRadius, distance);
+        float2 dir = (float2)(dx / distance, dy / distance);
+        pressureForce += -sharedPressure * dir * gradient * MASS / densityOther;
 
         // Viscosity
-        float2 velocityOtherParticle = velocities[j];
-        float visc = viscosityKernel(smoothingRadius, distance);
-        accel += (velocityOtherParticle - velocityParticle) * (visc / densityParticle) * viscosityMultiplier;
+        float2 velocityOtherParticle = aVelocities[otherparticleIndex];
+        float influence = viscosityKernel(aSmoothingRadius, distance);
+        viscosityForce += (velocityOtherParticle - velocityParticle) * influence * aViscosityMultiplier;
     }
 
-    // Integrate
-    velocityParticle += accel * dt;
-    positionParticle += velocityParticle * dt;
+    float2 totalPressure = (pressureForce + viscosityForce) / densityParticle;
 
-    velocities[i] = velocityParticle;
-    positions[i]  = positionParticle;
+    // Integrate
+    velocityParticle += totalPressure * aDeltaTime;
+    positionParticle += velocityParticle * aDeltaTime;
+
+    aVelocities[particleIndex] = velocityParticle;
+    aPositions[particleIndex] = positionParticle;
 }

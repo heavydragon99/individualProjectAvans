@@ -26,7 +26,15 @@ void FluidSimulation::run()
 
     while (mRenderer.isWindowOpen())
     {
-        mDeltaTime = mDeltaClock.restart() * 2.f;
+        mDeltaTime = mDeltaClock.restart();
+        if(SimulationConfig::getInstance().useGPU())
+        {
+            mDeltaTime *= 5.f;
+        }
+        else
+        {
+            mDeltaTime *= 2.f;
+        }
         processEvents();
         update();
         timeSinceLastGuiUpdate += guiClock.restart();
