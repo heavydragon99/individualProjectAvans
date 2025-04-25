@@ -33,7 +33,7 @@ __kernel void predictPositions(
     int particleIndex = get_global_id(0);
     float2 positionParticle = aPositions[particleIndex];
     float2 velocityParticle = aVelocities[particleIndex];
-    aPredictedPositions[particleIndex] = positionParticle + velocityParticle * 0.16666667f; // position + velocity * 1/60
+    aPredictedPositions[particleIndex] = positionParticle + velocityParticle * 0.016666667f; // position + velocity * 1/60
 }
 
 __kernel void computeDensity(
