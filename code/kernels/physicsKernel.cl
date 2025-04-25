@@ -5,7 +5,7 @@ static float smoothingKernel(float aRadius, float aDistance)
 {
     if (aDistance >= aRadius)
         return 0.0f;
-    float vol = (M_PI * aRadius * aRadius * aRadius * aRadius) * 0.16666667f; // πh^4/6
+    float vol = (M_PI_F * aRadius * aRadius * aRadius * aRadius) * 0.16666667f; // πh^4/6
     float x = (aRadius - aDistance);
     return (aRadius - aDistance) * (aRadius - aDistance) / vol;
 }
@@ -14,15 +14,16 @@ static float smoothingKernelDerivative(float aRadius, float aDistance)
 {
     if (aDistance >= aRadius)
         return 0.0f;
-    float scale = 12.0f / (M_PI * aRadius * aRadius * aRadius * aRadius);
+    float scale = 12.0f / (M_PI_F * aRadius * aRadius * aRadius * aRadius);
     return (aDistance - aRadius) * scale;
 }
 
-static float viscosityKernel(float aRadius, float aDistance)
+static float viscosityKernelLaplacian(float aRadius, float aDistance)
 {
-    float vol = (M_PI * aRadius * aRadius * aRadius * aRadius * aRadius * aRadius * aRadius * aRadius) * 0.25f; // πh^8/4
-    float val = fmax(0.0f, aRadius * aRadius - aDistance * aDistance);
-    return (val * val * val) / vol;
+    if (aDistance >= aRadius)
+        return 0.0f;
+    float coeff = 45.0f / (M_PI_F * pow(aRadius, 6));
+    return coeff * (aRadius - aDistance);
 }
 
 static float poly6Kernel(float aRadius, float aDistance)
@@ -125,7 +126,7 @@ __kernel void integrate(
 
         // Viscosity
         float2 velocityOtherParticle = aVelocities[otherparticleIndex];
-        float influence = viscosityKernel(aSmoothingRadius, distance);
+        float influence = viscosityKernelLaplacian(aSmoothingRadius, distance);
         viscosityForce += (velocityOtherParticle - velocityParticle) * influence * aViscosityMultiplier;
     }
 
