@@ -45,17 +45,17 @@ __kernel void computeDensity(
     int particleIndex = get_global_id(0);
     float2 positionParticle = aPredictedPositions[particleIndex];
     float density = 0.0f;
-    float smoothingRadiusSquared = aSmoothingRadius * aSmoothingRadius;
     for (int otherparticleIndex = 0; otherparticleIndex < aParticleCount; ++otherparticleIndex)
     {
         float2 PredictedPositionOtherParticle = aPredictedPositions[otherparticleIndex];
         float dx = PredictedPositionOtherParticle.x - positionParticle.x;
         float dy = PredictedPositionOtherParticle.y - positionParticle.y;
-        float distanceSquared = dx * dx + dy * dy;
-        if (distanceSquared <= 0.0f || distanceSquared > smoothingRadiusSquared)
-            continue;
+        float distanceSquared = (dx * dx) + (dy * dy);
         float inverseDistance = native_rsqrt(distanceSquared); // 1 / sqrt(distanceSquared)
         float distance = distanceSquared * inverseDistance;
+        if (distance <= 0.0f || distance > aSmoothingRadius)
+            continue;
+
         density += MASS * smoothingKernel(aSmoothingRadius, distance);
     }
     aDensities[particleIndex] = density;
@@ -89,8 +89,6 @@ __kernel void integrate(
     float2 pressureForce = (float2)(0.0f, 0.0f);
     float2 viscosityForce = (float2)(0.0f, 0.0f);
 
-    float smoothingRadiusSquared = aSmoothingRadius * aSmoothingRadius;
-
     // Interaction forces
     for (int otherparticleIndex = 0; otherparticleIndex < get_global_size(0); ++otherparticleIndex)
     {
@@ -99,12 +97,12 @@ __kernel void integrate(
         float2 PredictedPositionOtherParticle = aPredictedPositions[otherparticleIndex];
         float dx = PredictedPositionOtherParticle.x - predictedPositionParticle.x;
         float dy = PredictedPositionOtherParticle.y - predictedPositionParticle.y;
-        float distanceSquared = dx * dx + dy * dy;
-        if (distanceSquared <= 0.0f || distanceSquared > smoothingRadiusSquared)
-            continue;
-
+        float distanceSquared = (dx * dx) + (dy * dy);
         float inverseDistance = native_rsqrt(distanceSquared); // 1 / sqrt(distanceSquared)
         float distance = distanceSquared * inverseDistance;
+
+        if (distance <= 0.0f || distance > aSmoothingRadius)
+            continue;
 
         // Pressure force
         float densityOther = aDensities[otherparticleIndex];
