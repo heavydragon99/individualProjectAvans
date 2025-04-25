@@ -29,7 +29,7 @@ void FluidSimulation::run()
         mDeltaTime = mDeltaClock.restart();
         if(SimulationConfig::getInstance().useGPU())
         {
-            mDeltaTime *= 5.f;
+            mDeltaTime *= 3.f;
         }
         else
         {
