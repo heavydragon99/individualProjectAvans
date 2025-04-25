@@ -7,7 +7,7 @@ static float smoothingKernel(float aRadius, float aDistance)
         return 0.0f;
     float vol = (M_PI * aRadius * aRadius * aRadius * aRadius) * 0.16666667f; // πh^4/6
     float x = (aRadius - aDistance);
-    return (x * x) / vol;
+    return (aRadius - aDistance) * (aRadius - aDistance) / vol;
 }
 
 static float smoothingKernelDerivative(float aRadius, float aDistance)
@@ -50,7 +50,7 @@ __kernel void computeDensity(
         float2 PredictedPositionOtherParticle = aPredictedPositions[otherparticleIndex];
         float dx = PredictedPositionOtherParticle.x - positionParticle.x;
         float dy = PredictedPositionOtherParticle.y - positionParticle.y;
-        float distance = sqrt(dx * dx + dy * dy);
+        float distance = native_sqrt(dx * dx + dy * dy);
         density += MASS * smoothingKernel(aSmoothingRadius, distance);
     }
     aDensities[particleIndex] = density;
@@ -92,7 +92,7 @@ __kernel void integrate(
         float2 PredictedPositionOtherParticle = aPredictedPositions[otherparticleIndex];
         float dx = PredictedPositionOtherParticle.x - predictedPositionParticle.x;
         float dy = PredictedPositionOtherParticle.y - predictedPositionParticle.y;
-        float distance = sqrt(dx * dx + dy * dy);
+        float distance = native_sqrt(dx * dx + dy * dy);
         if (distance <= 0.0f || distance > aSmoothingRadius)
             continue;
 
