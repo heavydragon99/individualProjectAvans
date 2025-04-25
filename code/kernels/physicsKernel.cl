@@ -52,7 +52,11 @@ __kernel void computeDensity(
         float dx = PredictedPositionOtherParticle.x - positionParticle.x;
         float dy = PredictedPositionOtherParticle.y - positionParticle.y;
         float distanceSquared = dx * dx + dy * dy;
-        density += MASS * smoothingKernel(smoothingRadiusSquared, distanceSquared);
+        if (distanceSquared <= 0.0f || distanceSquared > smoothingRadiusSquared)
+            continue;
+        float inverseDistance = native_rsqrt(distanceSquared); // 1 / sqrt(distanceSquared)
+        float distance = distanceSquared * inverseDistance;
+        density += MASS * smoothingKernel(aSmoothingRadius, distance);
     }
     aDensities[particleIndex] = density;
 }
@@ -99,19 +103,22 @@ __kernel void integrate(
         if (distanceSquared <= 0.0f || distanceSquared > smoothingRadiusSquared)
             continue;
 
+        float inverseDistance = native_rsqrt(distanceSquared); // 1 / sqrt(distanceSquared)
+        float distance = distanceSquared * inverseDistance;
+
         // Pressure force
         float densityOther = aDensities[otherparticleIndex];
         if (densityOther <= 0.0f)
             continue; // Skip if density is zero or negative.
         float pressureOther = aPressureMultiplier * (densityOther - aTargetDensity);
         float sharedPressure = 0.5f * (pressureParticle + pressureOther);
-        float gradient = smoothingKernelDerivative(smoothingRadiusSquared, distanceSquared);
-        float2 dir = (float2)(dx * dx / distanceSquared, dy * dy / distanceSquared);
-        pressureForce -= sharedPressure * dir * gradient * MASS / densityOther;
+        float gradient = smoothingKernelDerivative(aSmoothingRadius, distance);
+        float2 dir = (float2)(dx * inverseDistance, dy * inverseDistance);
+        pressureForce += -sharedPressure * dir * gradient * MASS / densityOther;
 
         // Viscosity
         // float2 velocityOtherParticle = aVelocities[otherparticleIndex];
-        // float influence = viscosityKernel(smoothingRadiusSquared, distanceSquared);
+        // float influence = viscosityKernel(aSmoothingRadius, distance);
         // viscosityForce += (velocityOtherParticle - velocityParticle) * influence * aViscosityMultiplier;
     }
 
