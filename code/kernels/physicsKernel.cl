@@ -1,5 +1,6 @@
 #define MASS 1.0f
 #define COLLISION_DAMPING 0.8f
+#define MAX_NEIGHBORS 100
 
 static float smoothingKernel(float aRadius, float aDistance)
 {
@@ -57,14 +58,19 @@ __kernel void predictPositions(
 __kernel void computeDensity(
     __global const float2 *aPredictedPositions,
     __global float *aDensities,
+    __global const int *aNeighbors,
+    __global const int *aNeighborCounts,
     const int aParticleCount,
     const float aSmoothingRadius)
 {
     int particleIndex = get_global_id(0);
     float2 positionParticle = aPredictedPositions[particleIndex];
     float density = 0.0f;
-    for (int otherparticleIndex = 0; otherparticleIndex < aParticleCount; ++otherparticleIndex)
+    int baseIdx = particleIndex * MAX_NEIGHBORS;
+    int neighborCount = aNeighborCounts[particleIndex];
+    for (int i = 0; i < neighborCount; ++i)
     {
+        int otherparticleIndex = aNeighbors[baseIdx + i];
         float2 PredictedPositionOtherParticle = aPredictedPositions[otherparticleIndex];
         float dx = PredictedPositionOtherParticle.x - positionParticle.x;
         float dy = PredictedPositionOtherParticle.y - positionParticle.y;
@@ -79,6 +85,8 @@ __kernel void integrate(
     __global float2 *aVelocities,
     __global const float2 *aPredictedPositions,
     __global const float *aDensities,
+    __global const int *aNeighbors,
+    __global const int *aNeighborCounts,
     const float aDeltaTime,
     const float aTargetDensity,
     const float aPressureMultiplier,
@@ -102,11 +110,14 @@ __kernel void integrate(
     float2 pressureForce = (float2)(0.0f, 0.0f);
     float2 viscosityForce = (float2)(0.0f, 0.0f);
 
-    // Interaction forces
-    for (int otherparticleIndex = 0; otherparticleIndex < get_global_size(0); ++otherparticleIndex)
+    int baseIdx = particleIndex * MAX_NEIGHBORS;
+    int neighborCount = aNeighborCounts[particleIndex];
+    for (int i = 0; i < neighborCount; ++i)
     {
+        int otherparticleIndex = aNeighbors[baseIdx + i];
         if (otherparticleIndex == particleIndex)
             continue;
+
         float2 PredictedPositionOtherParticle = aPredictedPositions[otherparticleIndex];
         float dx = PredictedPositionOtherParticle.x - predictedPositionParticle.x;
         float dy = PredictedPositionOtherParticle.y - predictedPositionParticle.y;
@@ -129,7 +140,6 @@ __kernel void integrate(
         float influence = viscosityKernelLaplacian(aSmoothingRadius, distance);
         viscosityForce += (velocityOtherParticle - velocityParticle) * influence * aViscosityMultiplier;
     }
-
 
     float2 totalPressure = (pressureForce + viscosityForce) / densityParticle;
     totalPressure += (float2)(0.0f, aGravity);
@@ -164,4 +174,150 @@ __kernel void integrate(
     // Update positions and velocities
     aVelocities[particleIndex] = velocityParticle;
     aPositions[particleIndex] = positionParticle;
+}
+
+// Morton-code computation
+inline uint interleaveBits(uint x)
+{
+    x = (x | (x << 8)) & 0x00FF00FF;
+    x = (x | (x << 4)) & 0x0F0F0F0F;
+    x = (x | (x << 2)) & 0x33333333;
+    x = (x | (x << 1)) & 0x55555555;
+    return x;
+}
+
+__kernel void computeMorton(
+    __global const float2 *aPredictedPositions,
+    __global uint *aKeys,  // Morton codes
+    __global int *aValues, // Particle indices
+    const float aGridSize,
+    const int aCount)
+{
+    int i = get_global_id(0);
+    if (i >= aCount)
+        return;
+
+    float2 p = aPredictedPositions[i];
+
+    // Compute grid cell coordinates
+    uint xi = (uint)(p.x / aGridSize);
+    uint yi = (uint)(p.y / aGridSize);
+
+    // Compute Morton code
+    uint mortonCode = interleaveBits(xi) | (interleaveBits(yi) << 1);
+
+    // Output key-value pair
+    aKeys[i] = mortonCode;
+    aValues[i] = i;
+}
+
+// Build cell bounds (start/end indices of each Morton code cell)
+__kernel void buildCellBounds(
+    __global const uint *aMortonCodes,
+    __global int *aCellStart,
+    __global int *aCellEnd,
+    const int aCount)
+{
+    int i = get_global_id(0);
+    if (i >= aCount)
+        return;
+
+    uint code = aMortonCodes[i];
+    if (i == 0 || code != aMortonCodes[i - 1])
+    {
+        aCellStart[code] = i;
+        if (i > 0)
+            aCellEnd[aMortonCodes[i - 1]] = i;
+    }
+    if (i == aCount - 1)
+    {
+        aCellEnd[code] = aCount;
+    }
+}
+
+__kernel void bitonicSort(
+    __global uint *aKeys,  // Morton codes
+    __global int *aValues, // Particle indices
+    const uint aStage,
+    const uint aPassOfStage)
+{
+    int id = get_global_id(0);
+    uint pairDistance = 1 << (aStage - aPassOfStage);
+    uint blockWidth = 2 * pairDistance;
+    uint temp;
+
+    uint leftId = (id / pairDistance) * blockWidth + (id % pairDistance);
+    uint rightId = leftId + pairDistance;
+
+    bool sameDirection = ((id / blockWidth) % 2 == 0);
+    bool shouldSwap = (aKeys[leftId] > aKeys[rightId]) == sameDirection;
+
+    if (shouldSwap)
+    {
+        temp = aKeys[leftId];
+        aKeys[leftId] = aKeys[rightId];
+        aKeys[rightId] = temp;
+
+        int tempVal = aValues[leftId];
+        aValues[leftId] = aValues[rightId];
+        aValues[rightId] = tempVal;
+    }
+}
+
+__kernel void reorderParticles(
+    __global const float2 *aInput,
+    __global float2 *aOutput,
+    __global const int *aSortedIndices)
+{
+    int i = get_global_id(0);
+    aOutput[i] = aInput[aSortedIndices[i]];
+}
+
+// Neighbor search using cell bounds + morton codes
+__kernel void neighborSearch(
+    __global const float2 *aPredictedPositions,
+    __global const uint *aMortonCodes,
+    __global const int *aCellStart,
+    __global const int *aCellEnd,
+    __global int *aNeighbors,
+    __global int *aNeighborCounts,
+    const float aGridSize,
+    const float aSearchRadius,
+    const int aCount)
+{
+    int i = get_global_id(0);
+    if (i >= aCount)
+        return;
+
+    float2 p = aPredictedPositions[i];
+    uint xi = (uint)(p.x / aGridSize);
+    uint yi = (uint)(p.y / aGridSize);
+
+    int baseOut = i * MAX_NEIGHBORS; // reserve up to MAX_NEIGHBORS neighbors
+    int count = 0;
+
+    for (int dx = -1; dx <= 1; ++dx)
+    {
+        for (int dy = -1; dy <= 1; ++dy)
+        {
+            uint nx = xi + dx, ny = yi + dy;
+            uint cellCode = interleaveBits(nx) | (interleaveBits(ny) << 1);
+            int start = aCellStart[cellCode];
+            int end = aCellEnd[cellCode];
+            for (int idx = start; idx < end; ++idx)
+            {
+                if (idx == i)
+                    continue;
+                float2 q = aPredictedPositions[idx];
+                float dx = q.x - p.x, dy = q.y - p.y;
+                float dist2 = dx * dx + dy * dy;
+                if (dist2 <= aSearchRadius * aSearchRadius && count < MAX_NEIGHBORS)
+                {
+                    aNeighbors[baseOut + count] = idx;
+                    ++count;
+                }
+            }
+        }
+    }
+    aNeighborCounts[i] = count;
 }

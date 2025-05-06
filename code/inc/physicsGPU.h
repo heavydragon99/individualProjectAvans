@@ -8,6 +8,7 @@
 #include <vector>
 
 #define COLLISION_DAMPING 0.8f
+#define MAX_NEIGHBORS 100
 
 class PhysicsGPU
 {
@@ -30,12 +31,28 @@ private:
     cl::Kernel mKernelComputeDensity;
     cl::Kernel mKernelIntegrate;
     cl::Kernel mKernelPredictPositions;
+    cl::Kernel mKernelComputeMorton;
+    cl::Kernel mKernelBuildCellBounds;
+    cl::Kernel mKernelNeighborSearch;
+    cl::Kernel mKernelBitonicSort;
+    cl::Kernel mKernelReorderParticles;
 
     cl::Buffer mBufPositions;
     cl::Buffer mBufVelocities;
     cl::Buffer mBufDensities;
-    cl::Buffer mBufForces;
     cl::Buffer mBufPredictedPositions;
+
+    cl::Buffer mBufPositionsSorted;
+    cl::Buffer mBufVelocitiesSorted;
+    cl::Buffer mBufDensitiesSorted;
+    cl::Buffer mBufPredictedPositionsSorted;
+
+    cl::Buffer mBufMortonCodes;
+    cl::Buffer mBufSortIndices;
+    cl::Buffer mBufCellStart;
+    cl::Buffer mBufCellEnd;
+    cl::Buffer mBufNeighbors;
+    cl::Buffer mBufNeighborCounts;
 
     std::vector<Particle> &mParticles;
     size_t mCount;
