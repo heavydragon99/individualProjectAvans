@@ -20,6 +20,7 @@ In this course the student needs to make a project that incorporates the graphic
 The goal for this project is to use openCL to make a fluid simulation where water can be defined in a square space and the graphics card then calculates how the water flows.
 The focus first will be to make this in 2 dimensions. If this is done and there is time left the project will be expanded to 3 dimensions.
 
+\newpage
 \section*{Log of Activities}
 \begin{enumerate}
     \item \textbf{Read brightspace and init project}
@@ -156,6 +157,14 @@ The focus first will be to make this in 2 dimensions. If this is done and there 
 \end{tabular}
 
 \section*{Results}
+The project is a 2D fluid simulation implemented using OpenCL for GPU acceleration and SFML for rendering. 
+The current state of the simulation allows particles to be inserted into a square space and interact in a visually stable way, as long as gravity is not applied. 
+Without gravity, the system behaves as expected and provides a basic demonstration of fluid-like movement. 
+However, introducing gravity causes instability and breaks the simulation—particles begin to behave unpredictably, and the system no longer resembles a fluid. 
+An attempt was made to improve performance and accuracy by implementing a more efficient neighbor search algorithm using Morton codes. 
+Unfortunately, this approach was not successful and led to particles disappearing due to indexing issues or incorrect data structures. 
+Despite these setbacks, the project has provided valuable insights into GPU programming, particle systems, and simulation techniques.
+
 \begin{itemize}
     \item Learned the basics of OpenCL.
     \item Understood how to use OpenCL for parallel computing.
